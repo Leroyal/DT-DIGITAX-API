@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class DigitaxApiApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(DigitaxApiApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(DigitaxApiApplication.class, args);
+    }
 }

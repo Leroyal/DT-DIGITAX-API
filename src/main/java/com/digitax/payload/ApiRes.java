@@ -1,6 +1,5 @@
 package com.digitax.payload;
 
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -10,7 +9,7 @@ import java.util.Map;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class ApiRes<T>{
+public class ApiRes<T> {
     private ResCode co;
     private Map<?, ?> extras;
     private T da;
@@ -31,5 +30,4 @@ public class ApiRes<T>{
         return new ApiRes<P>().setDa(da).setCo(ResCode.S);
     }
 
-	
 }
