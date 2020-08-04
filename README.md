@@ -3,7 +3,7 @@
 DigiTax is the #1 tax preparation software in the world to file taxes online. Easily file federal and state
 income tax returns with 100% accurate Expert Approved Guarantee. 
 
-[![GitHub issues](https://img.shields.io/github/issues/Leroyal/DT-DIGITAX-API)](https://github.com/Leroyal/DT-DIGITAX-API/issues)
+[![GitHub issues](https://img.shields.io/github/issues/Leroyal/DT-DIGITAX-API)](https://github.com/Leroyal/DT-DIGITAX-API/issues) [![Build Status](https://github.com/Leroyal/DT-DIGITAX-API/workflows/CI/badge.svg)](https://github.com/Leroyal/DT-DIGITAX-API/workflows/CI/badge.svg)
 
 ## Table of Contents
 
@@ -87,7 +87,7 @@ Source: [https://spring.io/projects/spring-boot](https://spring.io/projects/spri
 The base URL for DIGITAX: http://52.6.241.241/.
 
 ### Sign Up
-Endpoint: `/auth/signup`
+Endpoint: `/api/auth/signup`
 
 API endpoint for user registration.
 
@@ -145,7 +145,7 @@ API endpoint for user registration.
 [table of contents](#table-of-contents)
 
 ### Sign In 
-Endpoint: `/auth/signin`
+Endpoint: `/api/auth/signin`
 
 API endpoint for user authentication.
 
@@ -202,7 +202,7 @@ API endpoint for user authentication.
 [table of contents](#table-of-contents)
 
 ### Sign Out 
-Endpoint: `/auth/signout`
+Endpoint: `/api/auth/signout`
 
 API endpoint to end user session.
 
