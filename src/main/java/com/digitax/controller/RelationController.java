@@ -26,7 +26,7 @@ public class RelationController {
 	    @GetMapping("/get/relations")
 	    public ResponseEntity<?>  getRelations(){
 	    	ArrayList<Relation> obj = new ArrayList<>(relationService.getRelation()); 
-			 return new ResponseEntity<>(ApiRes.success(obj).setMessage("List Relation"), HttpStatus.OK);
+			 return new ResponseEntity<>(ApiRes.success(obj,200).setMessage("List Relation"), HttpStatus.OK);
 		 }
 
 }

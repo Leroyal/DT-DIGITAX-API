@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,6 +31,7 @@ import com.digitax.payload.ApiRes;
 import com.digitax.payload.request.LoginRequest;
 import com.digitax.payload.request.SignupRequest;
 import com.digitax.payload.response.JwtResponse;
+import com.digitax.payload.response.SessionResponse;
 import com.digitax.repository.RoleRepository;
 import com.digitax.repository.UserRepository;
 import com.digitax.security.jwt.AuthEntryPointJwt;
@@ -41,6 +43,9 @@ import com.digitax.security.services.UserDetailsImpl;
 @RequestMapping("/api/auth")
 public class AuthController {
 	private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
+	
+	@Value("${digitax.app.jwtExpirationMs}")
+	private int jwtExpirationMs;
 	
 	@Autowired
 	AuthenticationManager authenticationManager;
@@ -70,34 +75,32 @@ public class AuthController {
 		List<String> roles = userDetails.getAuthorities().stream()
 				.map(item -> item.getAuthority())
 				.collect(Collectors.toList());
+		
+		Object Sessionobj = new SessionResponse(jwt,jwtExpirationMs);
 
-		Object obj = new JwtResponse(jwt, 
-							 userDetails.getId(), 
-							 userDetails.getUsername(), 
-							 userDetails.getEmail(), 
-							 roles);
-		 return new ResponseEntity<>(ApiRes.success(obj).setMessage("LogIn Success."), HttpStatus.OK);
+	    JwtResponse obj = new JwtResponse(Sessionobj,userDetails);
+		 return new ResponseEntity<>(ApiRes.success(obj,200).setMessage("Success."), HttpStatus.OK);
 		 } catch (Exception ex) {
 			 
 			 //logger.error("Unauthorized user.");
-             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail().setMessage("Unauthorized user."));
+             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(401).setMessage("Unauthorized user."));
 	        }
 	}
 
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-			return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail().setMessage("Username is already taken!"));
+			return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(400).setMessage("Username is already taken!"));
 			
 		}
 
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-			return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail().setMessage("Email is already in use!"));
+			return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(400).setMessage("Email is already in use!"));
 			
 		 }
 		
 		if (userRepository.existsByPhone(signUpRequest.getPhone())) {
-			return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail().setMessage("Phone is already in use!"));
+			return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(400).setMessage("Phone is already in use!"));
 			
 		 }
 
@@ -151,16 +154,14 @@ public class AuthController {
 						.map(item -> item.getAuthority())
 						.collect(Collectors.toList());
 
-				Object obj = new JwtResponse(jwt, 
-									 userDetails.getId(), 
-									 userDetails.getUsername(), 
-									 userDetails.getEmail(), 
-									 roles1);
-					 return new ResponseEntity<>(ApiRes.success(obj).setMessage("Sign Up Success."), HttpStatus.OK);
+				Object Sessionobj = new SessionResponse(jwt,jwtExpirationMs);
+
+			    JwtResponse obj = new JwtResponse(Sessionobj,userDetails);
+					 return new ResponseEntity<>(ApiRes.success(obj,200).setMessage("Success."), HttpStatus.OK);
 					 } catch (Exception ex) {
 					 
 					 logger.error("Unauthorized error: {}");
-		             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail().setMessage("Something went wrong."));
+		             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(500).setMessage("Something went wrong."));
 			        }
 	}
 }
