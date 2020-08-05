@@ -23,14 +23,13 @@ public class RelationController {
 	 
 	 @Autowired
 	 RelationRepository relationRepository;
-	 
-	 
+
 	    @SuppressWarnings("unchecked")
 		@GetMapping("/get/relations")
 	    public ResponseEntity<?>  getRelations(){
-	    	ArrayList<Relation> obj = new ArrayList<>(relationService.getRelation()); 
-	    	JSONObject statusObj=new JSONObject();    
-			statusObj.put("status_code",200);  
+	    	ArrayList<Relation> obj = new ArrayList<>(relationService.getRelation());
+	    	JSONObject statusObj=new JSONObject();
+			statusObj.put("status_code",200);
 			statusObj.put("message","SUCCESS");
 			 return new ResponseEntity<>(ApiRes.success(obj,statusObj), HttpStatus.OK);
 		 }

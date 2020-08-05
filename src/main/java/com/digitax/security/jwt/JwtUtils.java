@@ -21,38 +21,66 @@ public class JwtUtils {
 	@Value("${digitax.app.jwtExpirationMs}")
 	private int jwtExpirationMs;
 
+	/**
+	 * Method will generate JWT token.
+	 *
+	 * <p>JSON Web Token (JWT) is an open standard (RFC 7519) that defines a compact
+	 * and self-contained way for securely transmitting information between parties
+	 * as a JSON object.</p>
+	 *
+	 * @param authentication Represents the token for an authentication request or for an
+	 *                       authenticated principal once the request has been processed by the
+	 *                       AuthenticationManager.authenticate(Authentication) method.
+	 * @return JWT token
+	 * @see <a href="https://jwt.io/introduction/">https://jwt.io/introduction/</a>
+	 */
 	public String generateJwtToken(Authentication authentication) {
 
 		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-		String Id = String.valueOf(userPrincipal.getId());
+		String id = String.valueOf(userPrincipal.getId());
 		return Jwts.builder()
-				.setSubject(Id)
+				.setSubject(id)
 				.setIssuedAt(new Date())
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 				.signWith(SignatureAlgorithm.HS512, jwtSecret)
 				.compact();
 	}
 
+	/**
+	 * Method will extract username from JWT.
+	 *
+	 * @param token JWT token to extract user id from
+	 * @return User id value
+	 */
 	public String getUserIdFromJwtToken(String token) {
 		return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
 	}
 
-	public boolean validateJwtToken(String authToken) {
-		try {
-			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
-			return true;
-		} catch (SignatureException e) {
-			logger.error("Invalid JWT signature: {}", e.getMessage());
-		} catch (MalformedJwtException e) {
-			logger.error("Invalid JWT token: {}", e.getMessage());
-		} catch (ExpiredJwtException e) {
-			logger.error("JWT token is expired: {}", e.getMessage());
-		} catch (UnsupportedJwtException e) {
-			logger.error("JWT token is unsupported: {}", e.getMessage());
-		} catch (IllegalArgumentException e) {
-			logger.error("JWT claims string is empty: {}", e.getMessage());
-		}
-
-		return false;
-	}
+    /**
+	 * Validate JWT claims by checking signature, structure, expiration or empty claims. General
+	 * JWT structure consist of three parts separated by dots (.), which are:
+	 * --Header
+	 * --Payload
+	 * --Signature
+	 *
+     * @param token JWT token to extract username from
+     * @return True if JWT token is valid, otherwise false
+     */
+    public boolean validateJwtToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+            return true;
+        } catch (SignatureException e) {
+            logger.error("Invalid JWT signature: {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            logger.error("Invalid JWT token: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            logger.error("JWT token is expired: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            logger.error("JWT token is unsupported: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            logger.error("JWT claims string is empty: {}", e.getMessage());
+        }
+        return false;
+    }
 }

@@ -7,8 +7,11 @@ import org.springframework.stereotype.Repository;
 
 import com.digitax.model.User;
 
-@Repository
 
+/**
+ * String provided framework to build a JPA based data access layer.
+ */
+@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 	
 	Optional<User> findByUsername(String username);

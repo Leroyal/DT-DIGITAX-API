@@ -3,7 +3,7 @@
 DigiTax is the #1 tax preparation software in the world to file taxes online. Easily file federal and state
 income tax returns with 100% accurate Expert Approved Guarantee. 
 
-[![GitHub issues](https://img.shields.io/github/issues/Leroyal/DT-DIGITAX-API)](https://github.com/Leroyal/DT-DIGITAX-API/issues)
+[![GitHub issues](https://img.shields.io/github/issues/Leroyal/DT-DIGITAX-API)](https://github.com/Leroyal/DT-DIGITAX-API/issues) [![Build Status](https://github.com/Leroyal/DT-DIGITAX-API/workflows/CI/badge.svg)](https://github.com/Leroyal/DT-DIGITAX-API/workflows/CI/badge.svg)
 
 ## Table of Contents
 

@@ -20,8 +20,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.digitax.security.services.UserDetailsServiceImpl;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
-	@Autowired
-	private JwtUtils jwtUtils;
+    private static final String HEADER_AUTHORIZATION = "Authorization";
+    private static final String BEARER = "Bearer ";
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
 	@Autowired
 	private UserDetailsServiceImpl userDetailsService;
@@ -36,27 +39,38 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 			if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
 				String userid = jwtUtils.getUserIdFromJwtToken(jwt);
 
+				// user details
 				UserDetails userDetails = userDetailsService.loadUserByUsername(userid);
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 						userDetails, null, userDetails.getAuthorities());
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-			}
-		} catch (Exception e) {
-			logger.error("Cannot set user authentication: {}", e);
-		}
+                // set authentication
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (Exception e) {
+            logger.error("Cannot set user authentication: {}", e);
+        }
+        // filters use the FilterChain to invoke the next filter in the chain,
+        // or if the calling filter is the last filter in the chain, to invoke
+        // the resource at the end of the chain.
+        filterChain.doFilter(request, response);
+    }
 
-		filterChain.doFilter(request, response);
-	}
+    /**
+     * Method is used to retrieve header value
+     *
+     * @param request The servlet container creates an HttpServletRequest object
+     *                and passes it as an argument to the servlet's service methods
+     *                (doGet, doPost, etc).
+     * @return Header value or null
+     */
+    private String parseJwt(HttpServletRequest request) {
+        String headerAuth = request.getHeader(HEADER_AUTHORIZATION);
 
-	private String parseJwt(HttpServletRequest request) {
-		String headerAuth = request.getHeader("Authorization");
-
-		if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
-			return headerAuth.substring(7, headerAuth.length());
-		}
-
-		return null;
-	}
+        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+            return headerAuth.substring(BEARER.length(), headerAuth.length());
+        }
+        return null;
+    }
 }

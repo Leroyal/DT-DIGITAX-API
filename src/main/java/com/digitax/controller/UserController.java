@@ -20,11 +20,10 @@ import com.digitax.security.jwt.JwtUtils;
 @RestController
 @RequestMapping("/api/auth")
 public class UserController {
-	
+
 	@Autowired
 	JwtUtils jwtUtils;
-	
-	
+
 	@GetMapping("/all")
 	public String allAccess() {
 		return "Public Content.";
@@ -47,12 +46,12 @@ public class UserController {
 	public String adminAccess() {
 		return "Admin Board.";
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-		JSONObject statusObj=new JSONObject();    
-		statusObj.put("status_code",200);  
+		JSONObject statusObj=new JSONObject();
+		statusObj.put("status_code",200);
 		statusObj.put("message","SUCCESS");
 		return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
     }
