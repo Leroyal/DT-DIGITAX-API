@@ -9,21 +9,23 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 public class ApiRes<T>{
-    private int code;
+	private Object status;
 //    private Map<?, ?> extras;
-    private String message;
+//    private String message;
     private T data;
 
     private ApiRes() {
     }
 
-    public static ApiRes<?> fail(int code) {
-        return new ApiRes<Object>().setCode(code);
+    public static ApiRes<?> fail(Object status) {
+        return new ApiRes<Object>().setStatus(status);
     }
-
- 
-    public static <P> ApiRes<P> success(P da,int code) {
-        return new ApiRes<P>().setData(da).setCode(code);
+    
+    
+    public static <P> ApiRes<P> success(P da,Object status) {
+        return new ApiRes<P>().setData(da).setStatus(status);
     }
+    
+    
 	
 }

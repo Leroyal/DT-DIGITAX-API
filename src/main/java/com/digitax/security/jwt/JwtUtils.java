@@ -24,16 +24,16 @@ public class JwtUtils {
 	public String generateJwtToken(Authentication authentication) {
 
 		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-
+		String Id = String.valueOf(userPrincipal.getId());
 		return Jwts.builder()
-				.setSubject((userPrincipal.getUsername()))
+				.setSubject(Id)
 				.setIssuedAt(new Date())
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 				.signWith(SignatureAlgorithm.HS512, jwtSecret)
 				.compact();
 	}
 
-	public String getUserNameFromJwtToken(String token) {
+	public String getUserIdFromJwtToken(String token) {
 		return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
 	}
 

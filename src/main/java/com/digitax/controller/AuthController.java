@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
+import org.json.simple.JSONObject;   
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,6 +63,7 @@ public class AuthController {
 	@Autowired
 	JwtUtils jwtUtils;
 
+	@SuppressWarnings("unchecked")
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 		 try {
@@ -77,30 +79,51 @@ public class AuthController {
 				.collect(Collectors.toList());
 		
 		Object Sessionobj = new SessionResponse(jwt,jwtExpirationMs);
+		JSONObject userDetailsObj=new JSONObject();    
+		userDetailsObj.put("id",userDetails.getId());  
+		userDetailsObj.put("username",userDetails.getUsername());
+		userDetailsObj.put("email",userDetails.getEmail());
+		userDetailsObj.put("authorities",userDetails.getAuthorities());
 
-	    JwtResponse obj = new JwtResponse(Sessionobj,userDetails);
-		 return new ResponseEntity<>(ApiRes.success(obj,200).setMessage("Success."), HttpStatus.OK);
+	    JwtResponse obj = new JwtResponse(Sessionobj,userDetailsObj);
+	    JSONObject statusObj=new JSONObject();    
+		statusObj.put("status_code",200);  
+		statusObj.put("message","SUCCESS");
+		 return new ResponseEntity<>(ApiRes.success(obj,statusObj), HttpStatus.OK);
 		 } catch (Exception ex) {
 			 
 			 //logger.error("Unauthorized user.");
-             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(401).setMessage("Unauthorized user."));
+			 JSONObject statusObj=new JSONObject();    
+				statusObj.put("status_code",401);  
+				statusObj.put("message","Unauthorized user.");
+             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
 	        }
 	}
 
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-			return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(400).setMessage("Username is already taken!"));
+			JSONObject statusObj=new JSONObject();    
+			statusObj.put("status_code",new Integer(400));  
+			statusObj.put("message","Username is already taken!");
+			return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
 			
 		}
 
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-			return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(400).setMessage("Email is already in use!"));
+			JSONObject statusObj=new JSONObject();    
+			statusObj.put("status_code",new Integer(400));  
+			statusObj.put("message","Email is already in use");
+			return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
 			
 		 }
 		
 		if (userRepository.existsByPhone(signUpRequest.getPhone())) {
-			return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(400).setMessage("Phone is already in use!"));
+			JSONObject statusObj=new JSONObject();    
+			statusObj.put("status_code",new Integer(400));  
+			statusObj.put("message","Phone is already in use!");
+			return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
 			
 		 }
 
@@ -156,12 +179,24 @@ public class AuthController {
 
 				Object Sessionobj = new SessionResponse(jwt,jwtExpirationMs);
 
-			    JwtResponse obj = new JwtResponse(Sessionobj,userDetails);
-					 return new ResponseEntity<>(ApiRes.success(obj,200).setMessage("Success."), HttpStatus.OK);
+				JSONObject userDetailsObj=new JSONObject();    
+				userDetailsObj.put("id",userDetails.getId());  
+				userDetailsObj.put("username",userDetails.getUsername());
+				userDetailsObj.put("email",userDetails.getEmail());
+				userDetailsObj.put("authorities",userDetails.getAuthorities());
+
+			    JwtResponse obj = new JwtResponse(Sessionobj,userDetailsObj);
+			    
+			    JSONObject statusObj=new JSONObject();    
+				statusObj.put("status_code",new Integer(200));  
+				statusObj.put("message","SUCCESS");
+				return new ResponseEntity<>(ApiRes.success(obj,statusObj), HttpStatus.OK);
 					 } catch (Exception ex) {
-					 
+						    JSONObject statusObj=new JSONObject();    
+							statusObj.put("status_code",new Integer(500));  
+							statusObj.put("message","FAILURE");
 					 logger.error("Unauthorized error: {}");
-		             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(500).setMessage("Something went wrong."));
+		             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
 			        }
 	}
 }

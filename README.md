@@ -87,7 +87,7 @@ Source: [https://spring.io/projects/spring-boot](https://spring.io/projects/spri
 The base URL for DIGITAX: http://52.6.241.241/.
 
 ### Sign Up
-Endpoint: `/auth/signup`
+Endpoint: `/api/auth/signup`
 
 API endpoint for user registration.
 
@@ -104,8 +104,10 @@ API endpoint for user registration.
 
 ```json
 {
-    "email": "example@test.com",
-    "password": "examplePass11"
+    "username": "JayantaPA",
+    "email": "jayanta.5045ddd@gmail.com",
+    "password": "123456",
+    "phone": "80189442589"
 }
 ```
 </details>
@@ -114,30 +116,28 @@ API endpoint for user registration.
 
 ```json
 {
-  "user": {
-    "id": "97",
-    "phone": "555-555-5555",
-    "email": "example@test.com",
-    "userTypeId": "3",
-    "name": "John Doe",
-    "firstName": "John",
-    "lastName": "Doe",
-    "dateOfBirth": "01011983",
-    "sex": "male",
-    "verifiedEmail": "0",
-    "verifiedPhone": "0",
-    "active": "1",
-    "archived": "0",
-    "created": "2018-10-01 03:24:43",
-    "updated": "2018-10-01 03:24:43",
-    "deleted": "0"
-  },
-  "session": {
-    "accessToken": "07ywyJ6TdsMLOSh2GTfq328VyYEg6C3L",
-    "expirationMinutes": 300,
-    "UTCExpirationTime": "2019-10-16 18:52:27",
-    "PTExpirationTime": "2019-10-16 18:52:27"
-  }
+    "status": {
+        "status_code": 200,
+        "message": "SUCCESS"
+    },
+    "data": {
+        "user": {
+            "id": 4,
+            "email": "jayanta.5056@gmail.com",
+            "authorities": [
+                {
+                    "authority": "ROLE_USER"
+                }
+            ],
+            "username": "Jayanta"
+        },
+        "session": {
+            "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJKYXlhbnRhIiwiaWF0IjoxNTk2NjE0OTI5LCJleHAiOjE1OTY3MDEzMjl9.doC6QumEu_c_iF3kgd9Cb7vHyOYw3bFn2gTNVSLJP_M76DOyB7-Ay4KFgIIX4Cd6ZwXtt1ovYOLxjqQsQz72qw",
+            "expirationMiliSecond": 86400000,
+            "utcExpirationTime": "2020-08-06T08:08:49.119+00:00",
+            "ptExpirationTime": "2020-08-06T08:08:49.119+00:00"
+        }
+    }
 }
 ```
 </details>
@@ -145,7 +145,7 @@ API endpoint for user registration.
 [table of contents](#table-of-contents)
 
 ### Sign In 
-Endpoint: `/auth/signin`
+Endpoint: `/api/auth/signin`
 
 API endpoint for user authentication.
 
@@ -161,8 +161,8 @@ API endpoint for user authentication.
 
 ```json
 {
-  "email": "example@test.com",
-  "password": "examplePass11"
+    "username": "Jayanta",
+    "password": "123456"
 }
 ```
 </details>
@@ -171,30 +171,28 @@ API endpoint for user authentication.
 
 ```json
 {
-  "user": {
-    "id": "97",
-    "phone": "555-555-5555",
-    "email": "example@test.com",
-    "userTypeId": "3",
-    "name": "John Doe",
-    "firstName": "John",
-    "lastName": "Doe",
-    "dateOfBirth": "01011983",
-    "sex": "male",
-    "verifiedEmail": "0",
-    "verifiedPhone": "0",
-    "active": "1",
-    "archived": "0",
-    "created": "2018-10-01 03:24:43",
-    "updated": "2018-10-01 03:24:43",
-    "deleted": "0"
-  },
-  "session": {
-    "accessToken": "07ywyJ6TdsMLOSh2GTfq328VyYEg6C3L",
-    "expirationMinutes": 300,
-    "UTCExpirationTime": "2019-10-16 18:52:27",
-    "PTExpirationTime": "2019-10-16 18:52:27"
-  }
+    "status": {
+        "status_code": 200,
+        "message": "SUCCESS"
+    },
+    "data": {
+        "user": {
+            "id": 4,
+            "email": "jayanta.5056@gmail.com",
+            "authorities": [
+                {
+                    "authority": "ROLE_USER"
+                }
+            ],
+            "username": "Jayanta"
+        },
+        "session": {
+            "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJKYXlhbnRhIiwiaWF0IjoxNTk2NjE0OTI5LCJleHAiOjE1OTY3MDEzMjl9.doC6QumEu_c_iF3kgd9Cb7vHyOYw3bFn2gTNVSLJP_M76DOyB7-Ay4KFgIIX4Cd6ZwXtt1ovYOLxjqQsQz72qw",
+            "expirationMiliSecond": 86400000,
+            "utcExpirationTime": "2020-08-06T08:08:49.119+00:00",
+            "ptExpirationTime": "2020-08-06T08:08:49.119+00:00"
+        }
+    }
 }
 ```
 </details>
@@ -202,7 +200,7 @@ API endpoint for user authentication.
 [table of contents](#table-of-contents)
 
 ### Sign Out 
-Endpoint: `/auth/signout`
+Endpoint: `/api/auth/logout`
 
 API endpoint to end user session.
 

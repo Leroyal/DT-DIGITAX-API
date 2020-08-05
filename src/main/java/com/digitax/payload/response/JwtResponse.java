@@ -2,25 +2,25 @@ package com.digitax.payload.response;
 
 import java.util.List;
 
-import com.digitax.security.services.UserDetailsImpl;
+import org.json.simple.JSONObject;
 
 public class JwtResponse {
-	private UserDetailsImpl user;
+	private JSONObject user;
 	private Object session;
 	
-	public JwtResponse(Object sessionobj,UserDetailsImpl userDetails) {
-		 this.user = userDetails;
+	public JwtResponse(Object sessionobj,JSONObject userDetailsObj) {
+		 this.user = userDetailsObj;
 		 this.session = sessionobj;
 	}
 
 	
 
-	public UserDetailsImpl getUser() {
+	public JSONObject getUser() {
 		return user;
 	}
 
 	public void setUser(List<String> user) {
-		this.user = (UserDetailsImpl) user;
+		this.user = (JSONObject) user;
 	}
 
 	public Object getSession() {

@@ -1,6 +1,8 @@
 package com.digitax.controller;
 
 import java.util.ArrayList;
+
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +25,14 @@ public class RelationController {
 	 RelationRepository relationRepository;
 	 
 	 
-	    @GetMapping("/get/relations")
+	    @SuppressWarnings("unchecked")
+		@GetMapping("/get/relations")
 	    public ResponseEntity<?>  getRelations(){
 	    	ArrayList<Relation> obj = new ArrayList<>(relationService.getRelation()); 
-			 return new ResponseEntity<>(ApiRes.success(obj,200).setMessage("List Relation"), HttpStatus.OK);
+	    	JSONObject statusObj=new JSONObject();    
+			statusObj.put("status_code",200);  
+			statusObj.put("message","SUCCESS");
+			 return new ResponseEntity<>(ApiRes.success(obj,statusObj), HttpStatus.OK);
 		 }
 
 }
