@@ -8,9 +8,9 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class ApiRes<T>{
-	private Object status;
-//    private Map<?, ?> extras;
+public class ApiRes<T> {
+    private Object status;
+    //    private Map<?, ?> extras;
 //    private String message;
     private T data;
 
@@ -20,12 +20,11 @@ public class ApiRes<T>{
     public static ApiRes<?> fail(Object status) {
         return new ApiRes<Object>().setStatus(status);
     }
-    
-    
-    public static <P> ApiRes<P> success(P da,Object status) {
+
+
+    public static <P> ApiRes<P> success(P da, Object status) {
         return new ApiRes<P>().setData(da).setStatus(status);
     }
-    
-    
-	
+
+
 }
