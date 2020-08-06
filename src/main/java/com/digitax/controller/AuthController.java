@@ -4,7 +4,7 @@ import com.digitax.model.ERole;
 import com.digitax.model.Role;
 import com.digitax.model.User;
 import com.digitax.payload.ApiRes;
-import com.digitax.payload.request.LoginRequest;
+import com.digitax.payload.request.SigninRequest;
 import com.digitax.payload.request.SignupRequest;
 import com.digitax.payload.response.JwtResponse;
 import com.digitax.payload.response.SessionResponse;
@@ -59,7 +59,7 @@ public class AuthController {
 
     @SuppressWarnings("unchecked")
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody SigninRequest loginRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));

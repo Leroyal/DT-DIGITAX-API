@@ -47,7 +47,7 @@ public class UserController {
     }
 
     @SuppressWarnings("unchecked")
-    @GetMapping("/logout")
+    @GetMapping("/signout")
     public ResponseEntity<?> logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         JSONObject statusObj = new JSONObject();
         statusObj.put("status_code", 200);

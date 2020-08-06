@@ -10,8 +10,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ApiRes<T> {
     private Object status;
-    //    private Map<?, ?> extras;
-//    private String message;
     private T data;
 
     private ApiRes() {
