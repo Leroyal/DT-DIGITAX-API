@@ -262,7 +262,6 @@ API endpoint to end user session.
             "id": 2,
             "username": "JayantaPA",
             "email": "jayanta.5045ddd@gmail.com",
-            "password": "$2a$10$zYIVsFlyqytFOPuUeyDxKuTxsHUT0w3rl1Jy9yuXz1EqprJ6/lMEy",
             "phone": "80189442589",
             "roles": [
                 {
