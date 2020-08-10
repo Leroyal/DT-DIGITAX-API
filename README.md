@@ -228,6 +228,71 @@ API endpoint to end user session.
 ```
 </details>
 
+
+### User Details
+Endpoint: `/api/auth/user-details`
+
+API endpoint to end user session.
+
+| Code | Description           | Links    |
+|------|-----------------------|----------|
+| 200  | SUCCESS               | No Links |
+| 500  | INTERNAL_SERVER_ERROR | No Links |
+
+<details>
+    <summary>GET Request Header:</summary>
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNTk2Nzk5OTQ3LCJleHAiOjE1OTY4ODYzNDd9.w19Ve8UJez0w9kRGjy7zcYnj_docW9TyYSRmR_9sANzobO8RIaxSUVipkCt6he1uwMILzhBtrC26WV0dPXE_Tg"
+}
+```
+</details>
+<details>
+    <summary>Response:</summary>
+
+```json
+{
+    "status": {
+        "status_code": 200,
+        "message": "SUCCESS"
+    },
+    "data": {
+        "user": {
+            "id": 2,
+            "username": "JayantaPA",
+            "email": "jayanta.5045ddd@gmail.com",
+            "password": "$2a$10$zYIVsFlyqytFOPuUeyDxKuTxsHUT0w3rl1Jy9yuXz1EqprJ6/lMEy",
+            "phone": "80189442589",
+            "roles": [
+                {
+                    "id": 1,
+                    "name": "ROLE_USER"
+                }
+            ],
+            "is_deleted": 0,
+            "is_active": 0,
+            "isVerifiedEmail": 0,
+            "isVerifiedPhone": 0,
+            "createdAt": 1596733799716,
+            "deletedAt": null,
+            "updatedAt": null
+        },
+        "userDetails": {
+            "id": 1,
+            "userId": 2,
+            "firstName": "Jayanta",
+            "middleInitial": "Kumar",
+            "dateofbirth": "2020-08-25T18:21:11.000+00:00",
+            "lastName": "Panigtahi",
+            "createdAt": 1596733799716,
+            "updatedAt": null
+        }
+    }
+}
+```
+</details>
+
 [table of contents](#table-of-contents)
 
 ### Commit, Push & Creating Branches
