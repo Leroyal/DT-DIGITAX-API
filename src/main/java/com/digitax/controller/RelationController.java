@@ -1,5 +1,7 @@
 package com.digitax.controller;
 
+import com.digitax.constants.ResponseConstants;
+
 import com.digitax.model.Relation;
 import com.digitax.payload.ApiRes;
 import com.digitax.repository.RelationRepository;
@@ -24,6 +26,13 @@ public class RelationController {
     @GetMapping("/get/relations")
     public ResponseEntity<?> getRelations() {
         ArrayList<Relation> obj = new ArrayList<>(relationService.getRelation());
+<<<<<<< Updated upstream
         return new ResponseEntity<>(ApiRes.success(obj).setMessage("List Relation"), HttpStatus.OK);
+=======
+        JSONObject statusObj = new JSONObject();
+        statusObj.put("status_code", ResponseConstants.SUCCESS);
+        statusObj.put("message", "SUCCESS");
+        return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
+>>>>>>> Stashed changes
     }
 }

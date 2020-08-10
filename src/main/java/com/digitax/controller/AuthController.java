@@ -28,7 +28,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+<<<<<<< Updated upstream
 import com.digitax.controller.constants.Errors.*;
+=======
+import com.digitax.constants.ResponseConstants;
+>>>>>>> Stashed changes
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -47,6 +51,7 @@ public class AuthController {
 
     @Autowired
     PasswordEncoder encoder;
+    
 
     @Autowired
     JwtUtils jwtUtils;
@@ -78,6 +83,7 @@ public class AuthController {
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
 
+<<<<<<< Updated upstream
             Object obj = new JwtResponse(jwt,
                     userDetails.getId(),
                     userDetails.getUsername(),
@@ -111,6 +117,55 @@ public class AuthController {
 
         if (userRepository.existsByPhone(signupRequest.getPhone())) {
             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail().setMessage(ERROR_PHONE_NUMBER_IN_USE));
+=======
+            Object Sessionobj = new SessionResponse(jwt, jwtExpirationMs);
+            JSONObject userDetailsObj = new JSONObject();
+            userDetailsObj.put("id", userDetails.getId());
+            userDetailsObj.put("username", userDetails.getUsername());
+            userDetailsObj.put("email", userDetails.getEmail());
+            userDetailsObj.put("authorities", userDetails.getAuthorities());
+
+            JwtResponse obj = new JwtResponse(Sessionobj, userDetailsObj);
+            JSONObject statusObj = new JSONObject();
+            statusObj.put("status_code", ResponseConstants.CREATE_SUCCESS);
+            statusObj.put("message", "SUCCESS");
+            return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
+        } catch (Exception ex) {
+
+            //logger.error("Unauthorized user.");
+            JSONObject statusObj = new JSONObject();
+            statusObj.put("status_code", ResponseConstants.WRONG_EMAIL_OR_PASSWORD);
+            statusObj.put("message", "Unauthorized user.");
+            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
+        }
+    }
+
+    @SuppressWarnings({"unchecked"})
+    @PostMapping("/signup")
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+            JSONObject statusObj = new JSONObject();
+            statusObj.put("status_code", ResponseConstants.USER_ALREADY_EXISTS);
+            statusObj.put("message", "Username is already taken!");
+            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
+
+        }
+
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            JSONObject statusObj = new JSONObject();
+            statusObj.put("status_code", ResponseConstants.USER_ALREADY_EXISTS);
+            statusObj.put("message", "Email is already in use");
+            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
+
+        }
+
+        if (userRepository.existsByPhone(signUpRequest.getPhone())) {
+            JSONObject statusObj = new JSONObject();
+            statusObj.put("status_code",ResponseConstants.USER_ALREADY_EXISTS);
+            statusObj.put("message", "Phone is already in use!");
+            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
+
+>>>>>>> Stashed changes
         }
 
         // create new user's account
@@ -162,6 +217,7 @@ public class AuthController {
 
             // user details
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+<<<<<<< Updated upstream
             // list if roles
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(item -> item.getAuthority())
@@ -176,6 +232,29 @@ public class AuthController {
         } catch (Exception e) {
             logger.error("Unauthorized error: {}", e);
             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail().setMessage(ERROR_DEFAULT));
+=======
+
+            Object Sessionobj = new SessionResponse(jwt, jwtExpirationMs);
+
+            JSONObject userDetailsObj = new JSONObject();
+            userDetailsObj.put("id", userDetails.getId());
+            userDetailsObj.put("username", userDetails.getUsername());
+            userDetailsObj.put("email", userDetails.getEmail());
+            userDetailsObj.put("authorities", userDetails.getAuthorities());
+
+            JwtResponse obj = new JwtResponse(Sessionobj, userDetailsObj);
+
+            JSONObject statusObj = new JSONObject();
+            statusObj.put("status_code", ResponseConstants.SUCCESS);
+            statusObj.put("message", "SUCCESS");
+            return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
+        } catch (Exception ex) {
+            JSONObject statusObj = new JSONObject();
+            statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+            statusObj.put("message", "FAILURE");
+            logger.error("Unauthorized error: {}");
+            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
+>>>>>>> Stashed changes
         }
     }
 }
