@@ -104,10 +104,8 @@ API endpoint for user registration.
 
 ```json
 {
-    "username": "JayantaPA",
-    "email": "jayanta.5045ddd@gmail.com",
-    "password": "123456",
-    "phone": "80189442589"
+    "email": "example@test.com",
+    "password": "examplePass11"
 }
 ```
 </details>
@@ -116,28 +114,30 @@ API endpoint for user registration.
 
 ```json
 {
-    "status": {
-        "status_code": 200,
-        "message": "SUCCESS"
-    },
-    "data": {
-        "user": {
-            "id": 4,
-            "email": "jayanta.5056@gmail.com",
-            "authorities": [
-                {
-                    "authority": "ROLE_USER"
-                }
-            ],
-            "username": "Jayanta"
-        },
-        "session": {
-            "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJKYXlhbnRhIiwiaWF0IjoxNTk2NjE0OTI5LCJleHAiOjE1OTY3MDEzMjl9.doC6QumEu_c_iF3kgd9Cb7vHyOYw3bFn2gTNVSLJP_M76DOyB7-Ay4KFgIIX4Cd6ZwXtt1ovYOLxjqQsQz72qw",
-            "expirationMiliSecond": 86400000,
-            "utcExpirationTime": "2020-08-06T08:08:49.119+00:00",
-            "ptExpirationTime": "2020-08-06T08:08:49.119+00:00"
-        }
-    }
+  "user": {
+    "id": "97",
+    "phone": "555-555-5555",
+    "email": "example@test.com",
+    "userTypeId": "3",
+    "name": "John Doe",
+    "firstName": "John",
+    "lastName": "Doe",
+    "dateOfBirth": "01011983",
+    "sex": "male",
+    "verifiedEmail": "0",
+    "verifiedPhone": "0",
+    "active": "1",
+    "archived": "0",
+    "created": "2018-10-01 03:24:43",
+    "updated": "2018-10-01 03:24:43",
+    "deleted": "0"
+  },
+  "session": {
+    "accessToken": "07ywyJ6TdsMLOSh2GTfq328VyYEg6C3L",
+    "expirationMinutes": 300,
+    "UTCExpirationTime": "2019-10-16 18:52:27",
+    "PTExpirationTime": "2019-10-16 18:52:27"
+  }
 }
 ```
 </details>
@@ -161,8 +161,8 @@ API endpoint for user authentication.
 
 ```json
 {
-    "username": "Jayanta",
-    "password": "123456"
+  "email": "example@test.com",
+  "password": "examplePass11"
 }
 ```
 </details>
@@ -171,28 +171,30 @@ API endpoint for user authentication.
 
 ```json
 {
-    "status": {
-        "status_code": 200,
-        "message": "SUCCESS"
-    },
-    "data": {
-        "user": {
-            "id": 4,
-            "email": "jayanta.5056@gmail.com",
-            "authorities": [
-                {
-                    "authority": "ROLE_USER"
-                }
-            ],
-            "username": "Jayanta"
-        },
-        "session": {
-            "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJKYXlhbnRhIiwiaWF0IjoxNTk2NjE0OTI5LCJleHAiOjE1OTY3MDEzMjl9.doC6QumEu_c_iF3kgd9Cb7vHyOYw3bFn2gTNVSLJP_M76DOyB7-Ay4KFgIIX4Cd6ZwXtt1ovYOLxjqQsQz72qw",
-            "expirationMiliSecond": 86400000,
-            "utcExpirationTime": "2020-08-06T08:08:49.119+00:00",
-            "ptExpirationTime": "2020-08-06T08:08:49.119+00:00"
-        }
-    }
+  "user": {
+    "id": "97",
+    "phone": "555-555-5555",
+    "email": "example@test.com",
+    "userTypeId": "3",
+    "name": "John Doe",
+    "firstName": "John",
+    "lastName": "Doe",
+    "dateOfBirth": "01011983",
+    "sex": "male",
+    "verifiedEmail": "0",
+    "verifiedPhone": "0",
+    "active": "1",
+    "archived": "0",
+    "created": "2018-10-01 03:24:43",
+    "updated": "2018-10-01 03:24:43",
+    "deleted": "0"
+  },
+  "session": {
+    "accessToken": "07ywyJ6TdsMLOSh2GTfq328VyYEg6C3L",
+    "expirationMinutes": 300,
+    "UTCExpirationTime": "2019-10-16 18:52:27",
+    "PTExpirationTime": "2019-10-16 18:52:27"
+  }
 }
 ```
 </details>
@@ -200,7 +202,7 @@ API endpoint for user authentication.
 [table of contents](#table-of-contents)
 
 ### Sign Out 
-Endpoint: `/api/auth/logout`
+Endpoint: `/api/auth/signout`
 
 API endpoint to end user session.
 
@@ -223,6 +225,71 @@ API endpoint to end user session.
 
 ```json
 {}
+```
+</details>
+
+
+### User Details
+Endpoint: `/api/auth/user-details`
+
+API endpoint to end user session.
+
+| Code | Description           | Links    |
+|------|-----------------------|----------|
+| 200  | SUCCESS               | No Links |
+| 500  | INTERNAL_SERVER_ERROR | No Links |
+
+<details>
+    <summary>GET Request Header:</summary>
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNTk2Nzk5OTQ3LCJleHAiOjE1OTY4ODYzNDd9.w19Ve8UJez0w9kRGjy7zcYnj_docW9TyYSRmR_9sANzobO8RIaxSUVipkCt6he1uwMILzhBtrC26WV0dPXE_Tg"
+}
+```
+</details>
+<details>
+    <summary>Response:</summary>
+
+```json
+{
+    "status": {
+        "status_code": 200,
+        "message": "SUCCESS"
+    },
+    "data": {
+        "user": {
+            "id": 2,
+            "username": "JayantaPA",
+            "email": "jayanta.5045ddd@gmail.com",
+            "password": "$2a$10$zYIVsFlyqytFOPuUeyDxKuTxsHUT0w3rl1Jy9yuXz1EqprJ6/lMEy",
+            "phone": "80189442589",
+            "roles": [
+                {
+                    "id": 1,
+                    "name": "ROLE_USER"
+                }
+            ],
+            "is_deleted": 0,
+            "is_active": 0,
+            "isVerifiedEmail": 0,
+            "isVerifiedPhone": 0,
+            "createdAt": 1596733799716,
+            "deletedAt": null,
+            "updatedAt": null
+        },
+        "userDetails": {
+            "id": 1,
+            "userId": 2,
+            "firstName": "Jayanta",
+            "middleInitial": "Kumar",
+            "dateofbirth": "2020-08-25T18:21:11.000+00:00",
+            "lastName": "Panigtahi",
+            "createdAt": 1596733799716,
+            "updatedAt": null
+        }
+    }
+}
 ```
 </details>
 

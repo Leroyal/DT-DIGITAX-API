@@ -88,48 +88,14 @@ public class AuthController {
             statusObj.put("message", "SUCCESS");
             return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
        } catch (Exception e) {
-            //logger.error("Unauthorized user.", e);
-            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail().setMessage(ERROR_UNAUTHORIZED_USER));
-        }
+    	   JSONObject statusObj = new JSONObject();
+           statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+           statusObj.put("message", "FAILURE");
+           logger.error("Unauthorized error: {}");
+           return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));}
     }
 
-    @SuppressWarnings({"unchecked", "deprecation"})
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            JSONObject statusObj = new JSONObject();
-            statusObj.put("status_code", new Integer(400));
-            statusObj.put("message", "Username is already taken!");
-            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
-
-        }
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            JSONObject statusObj = new JSONObject();
-            statusObj.put("status_code", new Integer(400));
-            statusObj.put("message", "Email is already in use");
-            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
-           Object Sessionobj = new SessionResponse(jwt, jwtExpirationMs);
-            JSONObject userDetailsObj = new JSONObject();
-            userDetailsObj.put("id", userDetails.getId());
-            userDetailsObj.put("username", userDetails.getUsername());
-            userDetailsObj.put("email", userDetails.getEmail());
-            userDetailsObj.put("authorities", userDetails.getAuthorities());
-
-            JwtResponse obj = new JwtResponse(Sessionobj, userDetailsObj);
-            JSONObject statusObj = new JSONObject();
-            statusObj.put("status_code", ResponseConstants.CREATE_SUCCESS);
-            statusObj.put("message", "SUCCESS");
-            return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
-        } catch (Exception ex) {
-
-            //logger.error("Unauthorized user.");
-            JSONObject statusObj = new JSONObject();
-            statusObj.put("status_code", ResponseConstants.WRONG_EMAIL_OR_PASSWORD);
-            statusObj.put("message", "Unauthorized user.");
-            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
-        }
-    }
-
+  
     @SuppressWarnings({"unchecked"})
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
