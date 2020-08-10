@@ -32,6 +32,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import com.digitax.controller.constants.Errors.*;
+import com.digitax.constants.ResponseConstants;
+
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -53,6 +56,7 @@ public class AuthController {
 
     @Autowired
     PasswordEncoder encoder;
+    
 
     @Autowired
     JwtUtils jwtUtils;
@@ -71,7 +75,6 @@ public class AuthController {
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
-
             Object Sessionobj = new SessionResponse(jwt, jwtExpirationMs);
             JSONObject userDetailsObj = new JSONObject();
             userDetailsObj.put("id", userDetails.getId());
@@ -84,13 +87,9 @@ public class AuthController {
             statusObj.put("status_code", 200);
             statusObj.put("message", "SUCCESS");
             return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
-        } catch (Exception ex) {
-
-            //logger.error("Unauthorized user.");
-            JSONObject statusObj = new JSONObject();
-            statusObj.put("status_code", 401);
-            statusObj.put("message", "Unauthorized user.");
-            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
+       } catch (Exception e) {
+            //logger.error("Unauthorized user.", e);
+            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail().setMessage(ERROR_UNAUTHORIZED_USER));
         }
     }
 
@@ -104,10 +103,47 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
 
         }
-
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             JSONObject statusObj = new JSONObject();
             statusObj.put("status_code", new Integer(400));
+            statusObj.put("message", "Email is already in use");
+            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
+           Object Sessionobj = new SessionResponse(jwt, jwtExpirationMs);
+            JSONObject userDetailsObj = new JSONObject();
+            userDetailsObj.put("id", userDetails.getId());
+            userDetailsObj.put("username", userDetails.getUsername());
+            userDetailsObj.put("email", userDetails.getEmail());
+            userDetailsObj.put("authorities", userDetails.getAuthorities());
+
+            JwtResponse obj = new JwtResponse(Sessionobj, userDetailsObj);
+            JSONObject statusObj = new JSONObject();
+            statusObj.put("status_code", ResponseConstants.CREATE_SUCCESS);
+            statusObj.put("message", "SUCCESS");
+            return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
+        } catch (Exception ex) {
+
+            //logger.error("Unauthorized user.");
+            JSONObject statusObj = new JSONObject();
+            statusObj.put("status_code", ResponseConstants.WRONG_EMAIL_OR_PASSWORD);
+            statusObj.put("message", "Unauthorized user.");
+            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
+        }
+    }
+
+    @SuppressWarnings({"unchecked"})
+    @PostMapping("/signup")
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+            JSONObject statusObj = new JSONObject();
+            statusObj.put("status_code", ResponseConstants.USER_ALREADY_EXISTS);
+            statusObj.put("message", "Username is already taken!");
+            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
+
+        }
+
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            JSONObject statusObj = new JSONObject();
+            statusObj.put("status_code", ResponseConstants.USER_ALREADY_EXISTS);
             statusObj.put("message", "Email is already in use");
             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
 
@@ -115,11 +151,13 @@ public class AuthController {
 
         if (userRepository.existsByPhone(signUpRequest.getPhone())) {
             JSONObject statusObj = new JSONObject();
-            statusObj.put("status_code", new Integer(400));
+            statusObj.put("status_code",ResponseConstants.USER_ALREADY_EXISTS);
             statusObj.put("message", "Phone is already in use!");
             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
 
         }
+
+    
 
         // Create new user's account
         User user = new User(signUpRequest.getUsername(),
@@ -173,6 +211,7 @@ public class AuthController {
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
 
+
             Object Sessionobj = new SessionResponse(jwt, jwtExpirationMs);
 
             JSONObject userDetailsObj = new JSONObject();
@@ -184,12 +223,12 @@ public class AuthController {
             JwtResponse obj = new JwtResponse(Sessionobj, userDetailsObj);
 
             JSONObject statusObj = new JSONObject();
-            statusObj.put("status_code", new Integer(200));
+            statusObj.put("status_code", ResponseConstants.SUCCESS);
             statusObj.put("message", "SUCCESS");
             return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
         } catch (Exception ex) {
             JSONObject statusObj = new JSONObject();
-            statusObj.put("status_code", new Integer(500));
+            statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
             statusObj.put("message", "FAILURE");
             logger.error("Unauthorized error: {}");
             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));

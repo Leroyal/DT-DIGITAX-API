@@ -9,10 +9,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.digitax.security.services.UserDetailsImpl;
 
 public class UserSession {
-    public static String getUserId() {
+
+    public static long getUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-        return String.valueOf(userPrincipal.getId());
+        return userPrincipal.getId();
     }
 
     

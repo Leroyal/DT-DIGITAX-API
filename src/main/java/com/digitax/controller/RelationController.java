@@ -1,5 +1,7 @@
 package com.digitax.controller;
 
+import com.digitax.constants.ResponseConstants;
+
 import com.digitax.model.Relation;
 import com.digitax.payload.ApiRes;
 import com.digitax.repository.RelationRepository;
