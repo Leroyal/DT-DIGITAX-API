@@ -18,8 +18,21 @@ public class UserProfileServiceImpl implements UserProfileService {
   
 
     @Override
-    public void saveUserProfile(UserProfile raltion) {
-    	userProfileRepository.save(raltion);
+    public void saveUserProfile(UserProfile userProfile) {
+    	userProfileRepository.save(userProfile);
+    }
+    
+    @Override
+    public UserProfile updateDetails(UserProfile userProfile) {
+    	userProfileRepository.updateDetails(userProfile.getFirstName(),
+    			                            userProfile.getMiddleInitial(),
+    			                            userProfile.getDateofbirth(),
+    			                            userProfile.getLastName(),
+    			                            userProfile.getCreatedAt(),
+    			                            userProfile.getUserId()
+    			                            );
+    	
+    	return userProfile;
     }
 
     @Override

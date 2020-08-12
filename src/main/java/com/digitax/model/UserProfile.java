@@ -43,5 +43,15 @@ public class UserProfile {
     @LastModifiedDate
     @Column(name = "updated_at")
     private Long updatedAt;
+    
+    public UserProfile() {
+    }
+    public UserProfile(String firstName, String middleInitial, String lastName, Date dateofbirth,Long createdAt) {
+        this.firstName = firstName;
+        this.middleInitial = middleInitial;
+        this.lastName = lastName;
+        this.dateofbirth = dateofbirth;
+        this.createdAt = createdAt;
+    }
 
 }
