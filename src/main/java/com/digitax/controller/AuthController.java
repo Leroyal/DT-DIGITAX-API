@@ -13,6 +13,8 @@ import com.digitax.repository.UserRepository;
 import com.digitax.security.jwt.AuthEntryPointJwt;
 import com.digitax.security.jwt.JwtUtils;
 import com.digitax.security.services.UserDetailsImpl;
+import com.digitax.service.EmailService;
+
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,11 +62,23 @@ public class AuthController {
 
     @Autowired
     JwtUtils jwtUtils;
-
+    
+    @Autowired 
+    EmailService sendGridEmailService;
+    
+    
+    /**##
+     * 
+     * @param loginRequest
+     * @return
+     */
     @SuppressWarnings("unchecked")
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody SigninRequest loginRequest) {
-        try {
+    	sendGridEmailService.sendText("jayanta.5056@gmail.com", "jayanta@redappletech.com", "Hello World", "Hello, <strong>how are you");
+    	sendGridEmailService.sendHTML("jayanta.5056@gmail.com", "jayanta@redappletech.com", "Hello World", "Hello, <strong>how are you");
+        
+    	try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
@@ -95,7 +109,11 @@ public class AuthController {
            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));}
     }
 
-  
+    /**##
+     * 
+     * @param signUpRequest
+     * @return
+     */
     @SuppressWarnings({"unchecked"})
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
