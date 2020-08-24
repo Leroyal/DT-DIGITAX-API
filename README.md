@@ -1,4 +1,8 @@
-# DT-DIGITAX-API
+{
+    "username": "JayantaPA",
+    "password": "123456",
+    "deviceType":"IOS"
+}# DT-DIGITAX-API
 
 DigiTax is the #1 tax preparation software in the world to file taxes online. Easily file federal and state
 income tax returns with 100% accurate Expert Approved Guarantee. 
@@ -86,8 +90,8 @@ Source: [https://spring.io/projects/spring-boot](https://spring.io/projects/spri
 ## DIGITAX API
 The base URL for DIGITAX: http://52.6.241.241/.
 
-### Sign Up
-Endpoint: `/api/auth/signup`
+### Sign In
+Endpoint: `http://digitaxapi-env.eba-nrr834zb.us-east-1.elasticbeanstalk.com:8080/api/auth/signin`
 
 API endpoint for user registration.
 
@@ -104,48 +108,64 @@ API endpoint for user registration.
 
 ```json
 {
-    "email": "example@test.com",
-    "password": "examplePass11"
+    "username": "JayantaPA",
+    "password": "123456",
+    "deviceType":"IOS"
 }
 ```
+
+```json
+{
+    "email": "jayanta.5045ddd@gmail.com",
+    "password": "123456",
+    "deviceType":"ANDROID"
+}
+```
+
+```json
+{
+    "phone": "80189442589",
+    "password": "123456",
+    "deviceType":"WEB"
+}
+```
+
 </details>
 <details>
     <summary>Response:</summary>
 
 ```json
 {
-  "user": {
-    "id": "97",
-    "phone": "555-555-5555",
-    "email": "example@test.com",
-    "userTypeId": "3",
-    "name": "John Doe",
-    "firstName": "John",
-    "lastName": "Doe",
-    "dateOfBirth": "01011983",
-    "sex": "male",
-    "verifiedEmail": "0",
-    "verifiedPhone": "0",
-    "active": "1",
-    "archived": "0",
-    "created": "2018-10-01 03:24:43",
-    "updated": "2018-10-01 03:24:43",
-    "deleted": "0"
-  },
-  "session": {
-    "accessToken": "07ywyJ6TdsMLOSh2GTfq328VyYEg6C3L",
-    "expirationMinutes": 300,
-    "UTCExpirationTime": "2019-10-16 18:52:27",
-    "PTExpirationTime": "2019-10-16 18:52:27"
-  }
+    "status": {
+        "status_code": 200,
+        "message": "SUCCESS"
+    },
+    "data": {
+        "user": {
+            "id": 2,
+            "email": "jayanta.5045ddd@gmail.com",
+            "authorities": [
+                {
+                    "authority": "ROLE_USER"
+                }
+            ],
+            "username": "JayantaPA"
+        },
+        "session": {
+            "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNTk4Mjc4NjE1LCJleHAiOjE1OTkzMTc4NDR9.sF-KjmLt8aSTdjoRZPCA84UOwLF0_5YkcQaXGoiIvN9C3ZxDLm3R4zojnl0uNvJOWVVocOnJt2nwXLbPaQnNOw",
+            "expirationMiliSecond": 1039228928,
+            "utcExpirationTime": "2020-09-05T14:57:24.487+00:00",
+            "ptExpirationTime": "2020-09-05T14:57:24.487+00:00"
+        }
+    }
 }
 ```
 </details>
 
 [table of contents](#table-of-contents)
 
-### Sign In 
-Endpoint: `/api/auth/signin`
+### Sign Up 
+Endpoint: `http://digitaxapi-env.eba-nrr834zb.us-east-1.elasticbeanstalk.com:8080/api/auth/signup`
 
 API endpoint for user authentication.
 
@@ -161,8 +181,11 @@ API endpoint for user authentication.
 
 ```json
 {
-  "email": "example@test.com",
-  "password": "examplePass11"
+    "username": "JayantaPn6",
+    "email": "jayanta.5045dddd@gmail.com",
+    "password": "1234567",
+    "phone": "7008283103",
+    "deviceType":"IOS"
 }
 ```
 </details>
@@ -171,30 +194,28 @@ API endpoint for user authentication.
 
 ```json
 {
-  "user": {
-    "id": "97",
-    "phone": "555-555-5555",
-    "email": "example@test.com",
-    "userTypeId": "3",
-    "name": "John Doe",
-    "firstName": "John",
-    "lastName": "Doe",
-    "dateOfBirth": "01011983",
-    "sex": "male",
-    "verifiedEmail": "0",
-    "verifiedPhone": "0",
-    "active": "1",
-    "archived": "0",
-    "created": "2018-10-01 03:24:43",
-    "updated": "2018-10-01 03:24:43",
-    "deleted": "0"
-  },
-  "session": {
-    "accessToken": "07ywyJ6TdsMLOSh2GTfq328VyYEg6C3L",
-    "expirationMinutes": 300,
-    "UTCExpirationTime": "2019-10-16 18:52:27",
-    "PTExpirationTime": "2019-10-16 18:52:27"
-  }
+    "status": {
+        "status_code": 200,
+        "message": "SUCCESS"
+    },
+    "data": {
+        "user": {
+            "id": 2,
+            "email": "jayanta.5045ddd@gmail.com",
+            "authorities": [
+                {
+                    "authority": "ROLE_USER"
+                }
+            ],
+            "username": "JayantaPA"
+        },
+        "session": {
+            "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNTk4Mjc4NjE1LCJleHAiOjE1OTkzMTc4NDR9.sF-KjmLt8aSTdjoRZPCA84UOwLF0_5YkcQaXGoiIvN9C3ZxDLm3R4zojnl0uNvJOWVVocOnJt2nwXLbPaQnNOw",
+            "expirationMiliSecond": 1039228928,
+            "utcExpirationTime": "2020-09-05T14:57:24.487+00:00",
+            "ptExpirationTime": "2020-09-05T14:57:24.487+00:00"
+        }
+    }
 }
 ```
 </details>
@@ -230,7 +251,7 @@ API endpoint to end user session.
 
 
 ### User Details
-Endpoint: `/api/auth/user-details`
+Endpoint: `http://digitaxapi-env.eba-nrr834zb.us-east-1.elasticbeanstalk.com:8080/api/auth/user-details`
 
 API endpoint to end user session.
 
@@ -262,6 +283,7 @@ API endpoint to end user session.
             "id": 2,
             "username": "JayantaPA",
             "email": "jayanta.5045ddd@gmail.com",
+            "password": "$2a$10$zYIVsFlyqytFOPuUeyDxKuTxsHUT0w3rl1Jy9yuXz1EqprJ6/lMEy",
             "phone": "80189442589",
             "roles": [
                 {
@@ -282,10 +304,24 @@ API endpoint to end user session.
             "userId": 2,
             "firstName": "Jayanta",
             "middleInitial": "Kumar",
-            "dateofbirth": "2020-08-25T18:21:11.000+00:00",
-            "lastName": "Panigtahi",
+            "dateofbirth": "2020-05-25T18:21:11.000+00:00",
+            "lastName": "panigrahi",
             "createdAt": 1596733799716,
-            "updatedAt": null
+            "updatedAt": 1597924886654
+        },
+        "userAddress": {
+            "id": 7,
+            "userId": 2,
+            "addressLine1": "kasabajayapur",
+            "addressLine2": "khantapada",
+            "city": "balasore",
+            "state": "Odisha",
+            "stateCode": 756043,
+            "postalCode": 756043,
+            "country": "India",
+            "countryCode": 91,
+            "createdAt": 1597326665442,
+            "updatedAt": 1597924886654
         }
     }
 }
@@ -312,56 +348,19 @@ API endpoint to end user session.
 ```
 ```json
      {
-    "status": {
-        "status_code": 200,
-        "message": "SUCCESS"
-    },
-    "data": {
-        "user": {
-            "id": 2,
-            "username": "JayantaPA",
-            "email": "jayanta.5045ddd@gmail.com",
-            "phone": "80189442589",
-            "roles": [
-                {
-                    "id": 1,
-                    "name": "ROLE_USER"
-                }
-            ],
-            "is_deleted": 0,
-            "is_active": 0,
-            "isVerifiedEmail": 0,
-            "isVerifiedPhone": 0,
-            "createdAt": 1596733799716,
-            "deletedAt": null,
-            "updatedAt": null
-        },
-        "userDetails": {
-            "id": 1,
-            "userId": 2,
-            "firstName": "Jayanta",
-            "middleInitial": "Kumar",
-            "dateofbirth": "2020-05-25T18:21:11.000+00:00",
-            "lastName": "panigrahi",
-            "createdAt": 1596733799716,
-            "updatedAt": 1597340683984
-        },
-        "userAddress": {
-            "id": 8,
-            "userId": 2,
-            "addressLine1": "kasabajayapur",
-            "addressLine2": "khantapada",
-            "city": "balasore",
-            "state": "Odisha",
-            "stateCode": 756043,
-            "postalCode": 756043,
-            "country": "India",
-            "countryCode": 91,
-            "createdAt": 1597340683984,
-            "updatedAt": null
-        }
+        "firstName": "Jayanta",
+        "middleInitial": "Kumar",
+        "lastName": "panigrahi",
+        "dateofbirth": "2020-05-25T18:21:11.000+00:00",
+        "addressLine1": "kasabajayapur",
+        "addressLine2": "khantapada",
+        "city": "balasore",
+        "state": "Odisha",
+        "stateCode": "756043",
+        "countryCode":"+91",
+        "postalCode":"+788",
+        "country":"india"
     }
-}
 ```
 </details>
 <details>
@@ -378,6 +377,7 @@ API endpoint to end user session.
             "id": 2,
             "username": "JayantaPA",
             "email": "jayanta.5045ddd@gmail.com",
+            "password": "$2a$10$zYIVsFlyqytFOPuUeyDxKuTxsHUT0w3rl1Jy9yuXz1EqprJ6/lMEy",
             "phone": "80189442589",
             "roles": [
                 {
@@ -401,10 +401,10 @@ API endpoint to end user session.
             "dateofbirth": "2020-05-25T18:21:11.000+00:00",
             "lastName": "panigrahi",
             "createdAt": 1596733799716,
-            "updatedAt": 1597340683984
+            "updatedAt": 1597924886654
         },
         "userAddress": {
-            "id": 8,
+            "id": 7,
             "userId": 2,
             "addressLine1": "kasabajayapur",
             "addressLine2": "khantapada",
@@ -414,8 +414,8 @@ API endpoint to end user session.
             "postalCode": 756043,
             "country": "India",
             "countryCode": 91,
-            "createdAt": 1597340683984,
-            "updatedAt": null
+            "createdAt": 1597326665442,
+            "updatedAt": 1597924886654
         }
     }
 }
