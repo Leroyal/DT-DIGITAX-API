@@ -9,7 +9,6 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -56,14 +55,26 @@ public class User {
 
     @Column(name = "is_active")
     private int is_active;
+    
+    @Column(name = "isVerifiedEmail")
+    private int isVerifiedEmail;
+    
+    @Column(name = "isVerifiedPhone")
+    private int isVerifiedPhone;
+    
 
     @CreatedDate
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private Long createdAt;
+    
+    
+    @CreatedDate
+    @Column(name = "deleted_at")
+    private Long deletedAt;
 
     @LastModifiedDate
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Long updatedAt;
 
     public User() {
     }
@@ -76,11 +87,14 @@ public class User {
      * @param password The password of the user
      * @param phone    The phone number of the user
      */
-    public User(String username, String email, String password, String phone) {
+    public User(String username, String email, String password, String phone, Long createdAt) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.phone = phone;
+        this.createdAt = createdAt;
     }
+
+	
 
 }
