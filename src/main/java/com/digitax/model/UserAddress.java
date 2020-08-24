@@ -8,7 +8,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "a", uniqueConstraints = {
+@Table(name = "address", uniqueConstraints = {
         @UniqueConstraint(columnNames = "user_id"),
 })
 @Getter

@@ -3,6 +3,7 @@ package com.digitax.controller;
 import com.digitax.model.ERole;
 import com.digitax.model.Role;
 import com.digitax.model.User;
+import com.digitax.model.UserProfile;
 import com.digitax.payload.ApiRes;
 import com.digitax.payload.request.SigninRequest;
 import com.digitax.payload.request.SignupRequest;
@@ -12,6 +13,7 @@ import com.digitax.repository.RoleRepository;
 import com.digitax.repository.UserRepository;
 import com.digitax.security.jwt.AuthEntryPointJwt;
 import com.digitax.security.jwt.JwtUtils;
+import com.digitax.security.jwt.UserSession;
 import com.digitax.security.services.UserDetailsImpl;
 import com.digitax.service.EmailService;
 
@@ -27,11 +29,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import com.digitax.controller.constants.Errors.*;
@@ -74,22 +80,60 @@ public class AuthController {
      */
     @SuppressWarnings("unchecked")
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody SigninRequest loginRequest) {
-    	sendGridEmailService.sendText("jayanta.5056@gmail.com", "jayanta@redappletech.com", "Hello World", "Hello, <strong>how are you");
-    	sendGridEmailService.sendHTML("jayanta.5056@gmail.com", "jayanta@redappletech.com", "Hello World", "Hello, <strong>how are you");
-        
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody SigninRequest loginRequest,BindingResult bindingResult) {
+    	
+    	if (bindingResult.hasErrors()) {
+			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+			 JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", errors);
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
+        }
+    	long jwtExpiry;
+		   	  if(loginRequest.getDeviceType().equals("IOS") || loginRequest.getDeviceType().equals("ANDROID")) {
+		         jwtExpiry = jwtExpirationMs*360;
+		         System.out.println(jwtExpiry);
+		   	}
+		   	else
+		   	{
+		   	 jwtExpiry = jwtExpirationMs;
+		   	}
     	try {
-            Authentication authentication = authenticationManager.authenticate(
+    		Authentication authentication = null;
+    		if(loginRequest.getUsername() !=  null)
+    		{
+    			authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
+    		}
+    		
+    		else if(loginRequest.getEmail() != null)
+    		{
+    			User detailsObj = userRepository.findByEmail(loginRequest.getEmail());
+    			authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(detailsObj.getUsername().toLowerCase().trim(), loginRequest.getPassword()));
+    		}
+    		
+    		else if(loginRequest.getPhone()  !=  null)
+    		{
+    			User detailsObj = userRepository.findByPhone(loginRequest.getPhone());
+    			authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(detailsObj.getPhone(),loginRequest.getPassword()));
+    		}
+    		else {
+    			JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", "E-mail, Password or Phone is required");
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
+    		}
+    		
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtUtils.generateJwtToken(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication,loginRequest.getDeviceType());
 
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
-            Object Sessionobj = new SessionResponse(jwt, jwtExpirationMs);
+            Object Sessionobj = new SessionResponse(jwt, jwtExpiry);
             JSONObject userDetailsObj = new JSONObject();
             userDetailsObj.put("id", userDetails.getId());
             userDetailsObj.put("username", userDetails.getUsername());
@@ -116,7 +160,25 @@ public class AuthController {
      */
     @SuppressWarnings({"unchecked"})
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest,BindingResult bindingResult) {
+    	
+    	if (bindingResult.hasErrors()) {
+			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+			 JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", errors);
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
+        }
+    	
+    	long jwtExpiry;
+	   	  if(signUpRequest.getDeviceType().equals("IOS") || signUpRequest.getDeviceType().equals("ANDROID")) {
+	         jwtExpiry = jwtExpirationMs*360;
+	         System.out.println(jwtExpiry);
+	   	}
+	   	else
+	   	{
+	   	 jwtExpiry = jwtExpirationMs;
+	   	}
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             JSONObject statusObj = new JSONObject();
             statusObj.put("status_code", ResponseConstants.USER_ALREADY_EXISTS);
@@ -188,15 +250,15 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(signUpRequest.getUsername(), signUpRequest.getPassword()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtUtils.generateJwtToken(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication,signUpRequest.getDeviceType());
 
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             List<String> roles1 = userDetails.getAuthorities().stream()
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
 
-
-            Object Sessionobj = new SessionResponse(jwt, jwtExpirationMs);
+     
+            Object Sessionobj = new SessionResponse(jwt,jwtExpiry);
 
             JSONObject userDetailsObj = new JSONObject();
             userDetailsObj.put("id", userDetails.getId());

@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserDetailsRequest {
-	 @NotNull(message = "firstName required.")
+	@NotNull(message = "firstName required.")
     private String firstName;
     @NotNull(message = "middleInitial required.")
     private String middleInitial;
@@ -34,6 +34,8 @@ public class UserDetailsRequest {
     private String country;
     @NotNull(message = "countryCode required.")
     private Long countryCode;
+    
+    
     
 
 }

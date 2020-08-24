@@ -1,27 +1,26 @@
 package com.digitax.payload.request;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
+import lombok.Getter;
+import lombok.Setter;
+@Getter
+@Setter
 public class SigninRequest {
-    @NotBlank
     private String username;
+    
+   
+    private String email;
+    
+ 
+    private String phone;
 
-    @NotBlank
-    private String password;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    @NotBlank(message = "password can not be emppty.")
+    @NotNull(message = "password required.")
+    private String password; 
+    
+    @NotBlank(message = "deviceType can not be emppty.")
+    @NotNull(message = "deviceType required.")
+    private String deviceType; 
 }
