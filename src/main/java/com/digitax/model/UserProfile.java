@@ -53,5 +53,11 @@ public class UserProfile {
         this.dateofbirth = dateofbirth;
         this.createdAt = createdAt;
     }
+	@Override
+	public String toString() {
+		return "UserProfile [id=" + id + ", userId=" + userId + ", firstName=" + firstName + ", middleInitial="
+				+ middleInitial + ", dateofbirth=" + dateofbirth + ", lastName=" + lastName + ", createdAt=" + createdAt
+				+ ", updatedAt=" + updatedAt + "]";
+	}
 
 }

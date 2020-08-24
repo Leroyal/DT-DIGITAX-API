@@ -2,7 +2,6 @@ package com.digitax.controller;
 
 
 import com.digitax.payload.ApiRes;
-import com.digitax.payload.request.SigninRequest;
 import com.digitax.payload.request.UserDetailsRequest;
 import com.digitax.security.jwt.JwtUtils;
 import com.digitax.security.jwt.UserSession;
@@ -16,6 +15,8 @@ import com.digitax.repository.UserProfileRepository;
 import com.digitax.repository.UserRepository;
 import com.digitax.service.UserProfileService;
 
+import antlr.collections.List;
+
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,7 +37,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -75,7 +79,7 @@ public class UserController {
   
     @SuppressWarnings("unchecked")
 	@GetMapping("/user-details")
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> userProfileDetails() {
     	Optional<UserProfile> detailsObj = userProfileRepository.findByUserId(UserSession.getUserId());
     	Optional<User> user = userRepository.findById(UserSession.getUserId());
@@ -94,8 +98,15 @@ public class UserController {
 	@SuppressWarnings("unchecked")
 	@PutMapping("/user-details")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> updateUserProfileDetails(@Valid @RequestBody UserDetailsRequest userDetails) {
-    	Optional<UserProfile> detailsObj = userProfileRepository.findByUserId(UserSession.getUserId());
+    public ResponseEntity<?> updateUserProfileDetails(@Valid @RequestBody UserDetailsRequest userDetails,BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+			 JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", errors);
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
+        }
+		Optional<UserProfile> detailsObj = userProfileRepository.findByUserId(UserSession.getUserId());
     	Optional<User> user = userRepository.findById(UserSession.getUserId());
     	Optional<UserAddress> addressObj = userAddressRepository.findByUserId(UserSession.getUserId());
     	UserAddress userAddressObj = new UserAddress(
