@@ -240,6 +240,27 @@ public class UserController {
          return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
          }
   }
+	
+	
+	@SuppressWarnings("unchecked")
+	@GetMapping("/user-consents")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> getUserConsents() throws ParseException {
+		try {
+		Optional<UserConsent> obj = userConsentRepository.findByUserId(UserSession.getUserId());
+		JSONObject statusObj = new JSONObject();
+        statusObj.put("status_code", ResponseConstants.SUCCESS);
+        statusObj.put("message", "SUCCESS");
+        return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);	
+		} 
+		catch (Exception e) {
+		  	   JSONObject statusObj = new JSONObject();
+		         statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+		         statusObj.put("message", "FAILURE");
+		         return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
+		         }
+    }
+    
 		
 
 
