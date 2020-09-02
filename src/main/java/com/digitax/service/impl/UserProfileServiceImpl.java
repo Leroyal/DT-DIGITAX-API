@@ -29,6 +29,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     			                            userProfile.getDateofbirth(),
     			                            userProfile.getLastName(),
     			                            userProfile.getCreatedAt(),
+    			                            userProfile.isConsentToShareInformation(),
     			                            userProfile.getUserId()
     			                            );
     	

@@ -113,23 +113,6 @@ API endpoint for user registration.
     "deviceType":"IOS"
 }
 ```
-
-```json
-{
-    "email": "jayanta.5045ddd@gmail.com",
-    "password": "123456",
-    "deviceType":"ANDROID"
-}
-```
-
-```json
-{
-    "phone": "80189442589",
-    "password": "123456",
-    "deviceType":"WEB"
-}
-```
-
 </details>
 <details>
     <summary>Response:</summary>
@@ -305,9 +288,10 @@ API endpoint to end user session.
             "firstName": "Jayanta",
             "middleInitial": "Kumar",
             "dateofbirth": "2020-05-25T18:21:11.000+00:00",
+            "consentToShareInformation": true,
             "lastName": "panigrahi",
             "createdAt": 1596733799716,
-            "updatedAt": 1597924886654
+            "updatedAt": 1598449945503
         },
         "userAddress": {
             "id": 7,
@@ -317,11 +301,11 @@ API endpoint to end user session.
             "city": "balasore",
             "state": "Odisha",
             "stateCode": 756043,
-            "postalCode": 756043,
-            "country": "India",
+            "postalCode": 788,
+            "country": "india",
             "countryCode": 91,
             "createdAt": 1597326665442,
-            "updatedAt": 1597924886654
+            "updatedAt": 1598449945503
         }
     }
 }
@@ -359,7 +343,8 @@ API endpoint to end user session.
         "stateCode": "756043",
         "countryCode":"+91",
         "postalCode":"+788",
-        "country":"india"
+        "country":"india",
+        "consentToShareInformation":false
     }
 ```
 </details>
@@ -399,9 +384,10 @@ API endpoint to end user session.
             "firstName": "Jayanta",
             "middleInitial": "Kumar",
             "dateofbirth": "2020-05-25T18:21:11.000+00:00",
+            "consentToShareInformation": true,
             "lastName": "panigrahi",
             "createdAt": 1596733799716,
-            "updatedAt": 1597924886654
+            "updatedAt": 1598449945503
         },
         "userAddress": {
             "id": 7,
@@ -411,11 +397,11 @@ API endpoint to end user session.
             "city": "balasore",
             "state": "Odisha",
             "stateCode": 756043,
-            "postalCode": 756043,
-            "country": "India",
+            "postalCode": 788,
+            "country": "india",
             "countryCode": 91,
             "createdAt": 1597326665442,
-            "updatedAt": 1597924886654
+            "updatedAt": 1598449945503
         }
     }
 }

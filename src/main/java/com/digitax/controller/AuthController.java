@@ -1,5 +1,6 @@
 package com.digitax.controller;
 
+import io.swagger.annotations.Api;
 import com.digitax.model.ERole;
 import com.digitax.model.Role;
 import com.digitax.model.User;
@@ -29,9 +30,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import java.util.ArrayList;
@@ -44,8 +48,10 @@ import com.digitax.controller.constants.Errors.*;
 import com.digitax.constants.ResponseConstants;
 
 
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
+@Api(tags = {"AuthController"}, description = "Auth controller")
 @RequestMapping("/api/auth")
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
@@ -88,43 +94,40 @@ public class AuthController {
 		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
 		        statusObj.put("message", errors);
 		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
-        }
-    	long jwtExpiry;
+          }
+    	    long jwtExpiry;
 		   	  if(loginRequest.getDeviceType().equals("IOS") || loginRequest.getDeviceType().equals("ANDROID")) {
 		         jwtExpiry = jwtExpirationMs*360;
 		         System.out.println(jwtExpiry);
-		   	}
-		   	else
-		   	{
-		   	 jwtExpiry = jwtExpirationMs;
-		   	}
+			   	}
+			   	else
+			   	{
+			   	 jwtExpiry = jwtExpirationMs;
+			   	}
+			   	  
+		   	  
     	try {
     		Authentication authentication = null;
-    		if(loginRequest.getUsername() !=  null)
-    		{
-    			authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-    		}
-    		
-    		else if(loginRequest.getEmail() != null)
-    		{
-    			User detailsObj = userRepository.findByEmail(loginRequest.getEmail());
-    			authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(detailsObj.getUsername().toLowerCase().trim(), loginRequest.getPassword()));
-    		}
-    		
-    		else if(loginRequest.getPhone()  !=  null)
-    		{
-    			User detailsObj = userRepository.findByPhone(loginRequest.getPhone());
-    			authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(detailsObj.getPhone(),loginRequest.getPassword()));
-    		}
-    		else {
-    			JSONObject statusObj = new JSONObject();
-		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
-		        statusObj.put("message", "E-mail, Password or Phone is required");
-		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
-    		}
+    	        if (userRepository.existsByEmail(loginRequest.getUsername())) {
+    	        	 User detailsObj = userRepository.findByEmail(loginRequest.getUsername());
+    	        	authentication = authenticationManager.authenticate(
+       	                    new UsernamePasswordAuthenticationToken(detailsObj.getUsername().toLowerCase().trim(), loginRequest.getPassword()));
+    	        }
+    	        else if (userRepository.existsByPhone(loginRequest.getUsername())) {
+    	        	 User  detailsObj = userRepository.findByPhone(loginRequest.getUsername());
+    	        	authentication = authenticationManager.authenticate(
+       	                    new UsernamePasswordAuthenticationToken(detailsObj.getUsername().toLowerCase().trim(), loginRequest.getPassword()));
+    	        }
+    	        else if (userRepository.existsByUsername(loginRequest.getUsername())) {
+       			 authentication = authenticationManager.authenticate(
+       	                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername().toLowerCase().trim(), loginRequest.getPassword()));
+       	        }
+	    		else {
+	    			JSONObject statusObj = new JSONObject();
+			        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+			        statusObj.put("message", "User Does not exists");
+			        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
+	    		}
     		
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtUtils.generateJwtToken(authentication,loginRequest.getDeviceType());
@@ -279,5 +282,19 @@ public class AuthController {
             logger.error("Unauthorized error: {}");
             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
         }
+    }
+    
+    
+    @SuppressWarnings("unchecked")
+    @PostMapping("/signout")
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+    	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null){    
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+    	JSONObject statusObj = new JSONObject();
+        statusObj.put("status_code", ResponseConstants.SUCCESS);
+        statusObj.put("message", "SUCCESS");
+        return new ResponseEntity<>(ApiRes.success(null, statusObj), HttpStatus.OK);
     }
 }

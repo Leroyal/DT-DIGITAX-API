@@ -34,8 +34,5 @@ public class UserDetailsRequest {
     private String country;
     @NotNull(message = "countryCode required.")
     private Long countryCode;
-    
-    
-    
-
+    private boolean consentToShareInformation;
 }
