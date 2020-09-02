@@ -4,6 +4,7 @@ package com.digitax.controller;
 import com.digitax.payload.ApiRes;
 import com.digitax.payload.request.UserConsentRequest;
 import com.digitax.payload.request.UserDetailsRequest;
+import com.digitax.payload.request.UserTaxHistoryRequest;
 import com.digitax.security.jwt.JwtUtils;
 import com.digitax.security.jwt.UserSession;
 import com.digitax.constants.ResponseConstants;
@@ -129,7 +130,7 @@ public class UserController {
 	                System.currentTimeMillis(),
 	                userDetails.isConsentToShareInformation());
     	
-    	if(addressObj.isEmpty()) {
+    	if(!addressObj.isPresent()) {
     	     userAddressObj.setUserId(UserSession.getUserId());
 		     userAddressRepository.save(userAddressObj);
     	}
@@ -148,7 +149,7 @@ public class UserController {
     	}
     	
     	
-    	 if(detailsObj.isEmpty()) {
+    	 if(!detailsObj.isPresent()) {
     		    userDetailsObj.setUserId(UserSession.getUserId());
     		    userProfileRepository.save(userDetailsObj);
     	        JSONObject statusObj = new JSONObject();
@@ -206,7 +207,7 @@ public class UserController {
 				System.currentTimeMillis(),
 				userConsent.getConsentToShareInformation()
              );
-		if(detailsObj.isEmpty())
+		if(!detailsObj.isPresent())
 		{
 			userConsentObj.setUserId(UserSession.getUserId());
 			UserConsent obj = userConsentRepository.save(userConsentObj);
@@ -260,8 +261,34 @@ public class UserController {
 		         return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
 		         }
     }
+	
+	
+	@SuppressWarnings("unchecked")
+	@PostMapping("/user-tax-history")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> updateUserTaxHistory(@Valid @RequestBody UserTaxHistoryRequest taxHistory,BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+			 JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", errors);
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
+        }
+		try {
+			JSONObject statusObj = new JSONObject();
+	        statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+	        statusObj.put("message", "FAILURE");
+	        return new ResponseEntity<>(ApiRes.success(null, statusObj), HttpStatus.OK);	
+		}
+		catch (Exception e) {
+		JSONObject statusObj = new JSONObject();
+        statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+        statusObj.put("message", "FAILURE");
+        return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
+		 }
     
-		
+	}
+	
 
 
     @GetMapping("/mod")
