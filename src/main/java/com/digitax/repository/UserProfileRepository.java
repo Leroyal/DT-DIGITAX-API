@@ -22,7 +22,7 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
 	
 	@Modifying
     @Transactional 
-	@Query(value = "UPDATE user_profile SET first_name = ?1, middle_initial = ?2, dateofbirth= ?3, last_name = ?4, updated_at= ?5 WHERE user_id = ?6", nativeQuery = true)
-	public void updateDetails(String firstname, String middleInitial,Date dateofbirth,String lastname,Long updatedAt, Long user_id);
+	@Query(value = "UPDATE user_profile SET first_name = ?1, middle_initial = ?2, dateofbirth= ?3, last_name = ?4, updated_at= ?5, consent_to_share_information=?6 WHERE user_id = ?7", nativeQuery = true)
+	public void updateDetails(String firstname, String middleInitial,Date dateofbirth,String lastname,Long updatedAt, Boolean b, Long user_id);
 
 }

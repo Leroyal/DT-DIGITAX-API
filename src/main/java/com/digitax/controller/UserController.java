@@ -2,15 +2,19 @@ package com.digitax.controller;
 
 
 import com.digitax.payload.ApiRes;
+import com.digitax.payload.request.UserConsentRequest;
 import com.digitax.payload.request.UserDetailsRequest;
+import com.digitax.payload.request.UserTaxHistoryRequest;
 import com.digitax.security.jwt.JwtUtils;
 import com.digitax.security.jwt.UserSession;
 import com.digitax.constants.ResponseConstants;
 import com.digitax.model.User;
 import com.digitax.model.UserAddress;
+import com.digitax.model.UserConsent;
 import com.digitax.model.UserProfile;
 import com.digitax.payload.response.UserDetailsResponse;
 import com.digitax.repository.UserAddressRepository;
+import com.digitax.repository.UserConsentRepository;
 import com.digitax.repository.UserProfileRepository;
 import com.digitax.repository.UserRepository;
 import com.digitax.service.UserProfileService;
@@ -27,17 +31,20 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -67,20 +74,16 @@ public class UserController {
     
     @Autowired
     UserRepository userRepository;
+    
+    @Autowired
+    UserConsentRepository userConsentRepository;
   
 
 
-    @GetMapping("/all")
-    public String allAccess() {
-        return "Public Content.";
-    }
-
-
-  
     @SuppressWarnings("unchecked")
 	@GetMapping("/user-details")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> userProfileDetails() {
+    public ResponseEntity<?> userProfileDetails() throws ParseException {
     	Optional<UserProfile> detailsObj = userProfileRepository.findByUserId(UserSession.getUserId());
     	Optional<User> user = userRepository.findById(UserSession.getUserId());
     	Optional<UserAddress> addressObj = userAddressRepository.findByUserId(UserSession.getUserId());
@@ -124,9 +127,10 @@ public class UserController {
 				    userDetails.getMiddleInitial(),
 				    userDetails.getLastName(),
 				    userDetails.getDateofbirth(),
-	                System.currentTimeMillis());
+	                System.currentTimeMillis(),
+	                userDetails.isConsentToShareInformation());
     	
-    	if(addressObj.isEmpty()) {
+    	if(!addressObj.isPresent()) {
     	     userAddressObj.setUserId(UserSession.getUserId());
 		     userAddressRepository.save(userAddressObj);
     	}
@@ -145,7 +149,7 @@ public class UserController {
     	}
     	
     	
-    	 if(detailsObj.isEmpty()) {
+    	 if(!detailsObj.isPresent()) {
     		    userDetailsObj.setUserId(UserSession.getUserId());
     		    userProfileRepository.save(userDetailsObj);
     	        JSONObject statusObj = new JSONObject();
@@ -169,11 +173,123 @@ public class UserController {
          statusObj.put("message", "SUCCESS");
          System.out.println(UserSession.getUserId()); 
          return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
-    	 
-    	
-    	
-
     }
+	
+	@SuppressWarnings("unchecked")
+	@PostMapping("/user-consents")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> updateUserConsents(@Valid @RequestBody UserConsentRequest userConsent,BindingResult bindingResult) throws ParseException{
+		if (bindingResult.hasErrors()) {
+			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+			 JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", errors);
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
+        }
+		int year = Calendar.getInstance().get(Calendar.YEAR);
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    	Date currentDate = sdf.parse(year+"-01-01T00:00:00.235-0700");
+    	Calendar calndr = Calendar.getInstance();
+    	calndr.setTime(currentDate);
+    	calndr.add(Calendar.YEAR, 1);
+    	Date newDate = calndr.getTime();
+    	System.out.println(newDate); 
+		try {
+		
+		Optional<UserConsent> detailsObj = userConsentRepository.findByUserId(UserSession.getUserId());
+		UserConsent userConsentObj = new UserConsent(
+				userConsent.getFirstName(),
+				userConsent.getLastName(),
+				userConsent.getSpouseFirstName(),
+				userConsent.getSpouseLastName(),
+				newDate,
+				newDate,
+				System.currentTimeMillis(),
+				userConsent.getConsentToShareInformation()
+             );
+		if(!detailsObj.isPresent())
+		{
+			userConsentObj.setUserId(UserSession.getUserId());
+			UserConsent obj = userConsentRepository.save(userConsentObj);
+	        JSONObject statusObj = new JSONObject();
+	        statusObj.put("status_code", ResponseConstants.SUCCESS);
+	        statusObj.put("message", "SUCCESS");
+	        return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);	
+		}
+		else
+		{
+		 userConsentRepository.updateConsent(
+					userConsent.getFirstName(),
+					userConsent.getLastName(),
+					userConsent.getSpouseFirstName(),
+					userConsent.getSpouseLastName(),
+					System.currentTimeMillis(),
+					userConsent.getConsentToShareInformation(),
+					UserSession.getUserId());
+		   Optional<UserConsent> obj = userConsentRepository.findByUserId(UserSession.getUserId());
+			JSONObject statusObj = new JSONObject();
+	        statusObj.put("status_code", ResponseConstants.SUCCESS);
+	        statusObj.put("message", "SUCCESS");
+	        return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);	
+			
+		}
+		
+	 } catch (Exception e) {
+  	   JSONObject statusObj = new JSONObject();
+         statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+         statusObj.put("message", "FAILURE");
+         return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
+         }
+  }
+	
+	
+	@SuppressWarnings("unchecked")
+	@GetMapping("/user-consents")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> getUserConsents() throws ParseException {
+		try {
+		Optional<UserConsent> obj = userConsentRepository.findByUserId(UserSession.getUserId());
+		JSONObject statusObj = new JSONObject();
+        statusObj.put("status_code", ResponseConstants.SUCCESS);
+        statusObj.put("message", "SUCCESS");
+        return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);	
+		} 
+		catch (Exception e) {
+		  	   JSONObject statusObj = new JSONObject();
+		         statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+		         statusObj.put("message", "FAILURE");
+		         return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
+		         }
+    }
+	
+	
+	@SuppressWarnings("unchecked")
+	@PostMapping("/user-tax-history")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> updateUserTaxHistory(@Valid @RequestBody UserTaxHistoryRequest taxHistory,BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+			 JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", errors);
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
+        }
+		try {
+			JSONObject statusObj = new JSONObject();
+	        statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+	        statusObj.put("message", "FAILURE");
+	        return new ResponseEntity<>(ApiRes.success(null, statusObj), HttpStatus.OK);	
+		}
+		catch (Exception e) {
+		JSONObject statusObj = new JSONObject();
+        statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+        statusObj.put("message", "FAILURE");
+        return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
+		 }
+    
+	}
+	
+
 
     @GetMapping("/mod")
     @PreAuthorize("hasRole('MODERATOR')")
@@ -185,14 +301,5 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public String adminAccess() {
         return "Admin Board.";
-    }
-
-    @SuppressWarnings("unchecked")
-    @GetMapping("/signout")
-    public ResponseEntity<?> logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        JSONObject statusObj = new JSONObject();
-        statusObj.put("status_code", 200);
-        statusObj.put("message", "SUCCESS");
-        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
     }
 }

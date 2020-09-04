@@ -8,13 +8,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SigninRequest {
+	@NotBlank(message = "username can not be emppty.")
+	@NotNull(message = "username required.")
     private String username;
-    
-   
-    private String email;
-    
- 
-    private String phone;
 
     @NotBlank(message = "password can not be emppty.")
     @NotNull(message = "password required.")
