@@ -1,22 +1,29 @@
 package com.digitax.controller;
 
 import io.swagger.annotations.Api;
+
+import com.digitax.model.DeviceMetadata;
 import com.digitax.model.ERole;
+import com.digitax.model.MarketingPreference;
 import com.digitax.model.Role;
 import com.digitax.model.User;
 import com.digitax.model.UserProfile;
 import com.digitax.payload.ApiRes;
 import com.digitax.payload.request.SigninRequest;
 import com.digitax.payload.request.SignupRequest;
+import com.digitax.payload.request.UpdatePasswordRequest;
 import com.digitax.payload.response.JwtResponse;
 import com.digitax.payload.response.SessionResponse;
+import com.digitax.repository.DeviceMetadataRepository;
 import com.digitax.repository.RoleRepository;
 import com.digitax.repository.UserRepository;
 import com.digitax.security.jwt.AuthEntryPointJwt;
 import com.digitax.security.jwt.JwtUtils;
 import com.digitax.security.jwt.UserSession;
+import com.digitax.service.DeviceMetadataService;
 import com.digitax.security.services.UserDetailsImpl;
 import com.digitax.service.EmailService;
+import com.digitax.service.SmsService;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -25,11 +32,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -71,12 +82,20 @@ public class AuthController {
     @Autowired
     PasswordEncoder encoder;
     
-
+    @Autowired
+    SmsService smsService;
+    
     @Autowired
     JwtUtils jwtUtils;
     
     @Autowired 
     EmailService sendGridEmailService;
+    
+    @Autowired 
+    DeviceMetadataRepository deviceMetadataRepository;
+    
+    @Autowired 
+    DeviceMetadataService devideMetadataService;
     
     
     /**##
@@ -86,14 +105,14 @@ public class AuthController {
      */
     @SuppressWarnings("unchecked")
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody SigninRequest loginRequest,BindingResult bindingResult) {
-    	
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody SigninRequest loginRequest,HttpServletRequest request,BindingResult bindingResult) {
+    	//smsService.sendSMS("+15005550006", "test");
     	if (bindingResult.hasErrors()) {
 			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
 			 JSONObject statusObj = new JSONObject();
 		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
 		        statusObj.put("message", errors);
-		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
+		        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
           }
     	    long jwtExpiry;
 		   	  if(loginRequest.getDeviceType().equals("IOS") || loginRequest.getDeviceType().equals("ANDROID")) {
@@ -110,7 +129,7 @@ public class AuthController {
     		Authentication authentication = null;
     	        if (userRepository.existsByEmail(loginRequest.getUsername())) {
     	        	 User detailsObj = userRepository.findByEmail(loginRequest.getUsername());
-    	        	authentication = authenticationManager.authenticate(
+    	        	 authentication = authenticationManager.authenticate(
        	                    new UsernamePasswordAuthenticationToken(detailsObj.getUsername().toLowerCase().trim(), loginRequest.getPassword()));
     	        }
     	        else if (userRepository.existsByPhone(loginRequest.getUsername())) {
@@ -126,9 +145,10 @@ public class AuthController {
 	    			JSONObject statusObj = new JSONObject();
 			        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
 			        statusObj.put("message", "User Does not exists");
-			        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
+			        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
+			       
 	    		}
-    		
+    	        
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtUtils.generateJwtToken(authentication,loginRequest.getDeviceType());
 
@@ -147,13 +167,17 @@ public class AuthController {
             JSONObject statusObj = new JSONObject();
             statusObj.put("status_code", 200);
             statusObj.put("message", "SUCCESS");
+            
+            devideMetadataService.saveUserActivity(request,UserSession.getUserId());
+	        
             return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
        } catch (Exception e) {
     	   JSONObject statusObj = new JSONObject();
            statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
            statusObj.put("message", "FAILURE");
            logger.error("Unauthorized error: {}");
-           return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));}
+           return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);
+           }
     }
 
     /**##
@@ -170,7 +194,7 @@ public class AuthController {
 			 JSONObject statusObj = new JSONObject();
 		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
 		        statusObj.put("message", errors);
-		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
+		        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
         }
     	
     	long jwtExpiry;
@@ -186,7 +210,7 @@ public class AuthController {
             JSONObject statusObj = new JSONObject();
             statusObj.put("status_code", ResponseConstants.USER_ALREADY_EXISTS);
             statusObj.put("message", "Username is already taken!");
-            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
+            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
 
         }
 
@@ -194,15 +218,15 @@ public class AuthController {
             JSONObject statusObj = new JSONObject();
             statusObj.put("status_code", ResponseConstants.USER_ALREADY_EXISTS);
             statusObj.put("message", "Email is already in use");
-            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
+            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
 
         }
-
-        if (userRepository.existsByPhone(signUpRequest.getPhone())) {
+        System.out.println(signUpRequest.getPhone());
+        if (signUpRequest.getPhone() != null && userRepository.existsByPhone(signUpRequest.getPhone())) {
             JSONObject statusObj = new JSONObject();
             statusObj.put("status_code",ResponseConstants.USER_ALREADY_EXISTS);
             statusObj.put("message", "Phone is already in use!");
-            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
+            return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
 
         }
 
@@ -213,6 +237,7 @@ public class AuthController {
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()),
                 signUpRequest.getPhone(),
+                signUpRequest.getDeviceType(),
                 System.currentTimeMillis());
         
         Set<String> strRoles = signUpRequest.getRole();
@@ -296,5 +321,58 @@ public class AuthController {
         statusObj.put("status_code", ResponseConstants.SUCCESS);
         statusObj.put("message", "SUCCESS");
         return new ResponseEntity<>(ApiRes.success(null, statusObj), HttpStatus.OK);
+    }
+    
+    
+    @SuppressWarnings("unchecked")
+    @PostMapping("/update-password")
+    public ResponseEntity<?> updatePassword(@Valid @RequestBody UpdatePasswordRequest request,BindingResult bindingResult) {
+    	if (bindingResult.hasErrors()) {
+			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+			 JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", errors);
+		        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
+          }    
+    	if (userRepository.existsByEmail(request.getEmail())) {
+       	 User detailsObj = userRepository.findByEmail(request.getEmail());
+       	Authentication authentication = authenticationManager.authenticate(
+	                    new UsernamePasswordAuthenticationToken(detailsObj.getUsername().toLowerCase().trim(), request.getOldPassword()));
+       	detailsObj.setPassword(encoder.encode(request.getPassword()));
+       	userRepository.save(detailsObj);
+       	JSONObject statusObj = new JSONObject();	   
+        statusObj.put("status_code", ResponseConstants.SUCCESS);
+        statusObj.put("message", "SUCCESS");
+        return new ResponseEntity<>(ApiRes.success(null, statusObj), HttpStatus.OK);
+    	}
+    	else {
+			JSONObject statusObj = new JSONObject();
+	        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+	        statusObj.put("message", "User Does not exists");
+	        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
+	       
+		}
+    		    
+        
+    }
+    
+    
+    @SuppressWarnings("unchecked")
+	@GetMapping("/user-accoun-activity")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> getUserAccountActivity() {
+		try {
+		List<DeviceMetadata> detailsObj = deviceMetadataRepository.findByUserId(UserSession.getUserId());
+		JSONObject statusObj = new JSONObject();
+        statusObj.put("status_code", ResponseConstants.SUCCESS);
+        statusObj.put("message", "SUCCESS");
+        return new ResponseEntity<>(ApiRes.success(detailsObj, statusObj), HttpStatus.OK);	
+		} 
+		catch (Exception e) {
+		  	   JSONObject statusObj = new JSONObject();
+		         statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+		         statusObj.put("message", "FAILURE");
+		         return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
+		         }
     }
 }

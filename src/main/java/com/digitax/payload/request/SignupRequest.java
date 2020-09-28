@@ -28,8 +28,7 @@ public class SignupRequest {
     @Size(min = 6, max = 40)
     private String password;
 
-    @NotBlank(message = "phone can not be emppty.")
-    @NotNull(message = "phone required.")
+
     @Size(min = 10, max = 10)
     private String phone;
     

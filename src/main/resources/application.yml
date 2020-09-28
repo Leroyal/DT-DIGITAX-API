@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: "prod"
+    active: "dev"
   main:
     banner-mode: "off"
   servlet:
@@ -19,12 +19,18 @@ digitax:
     port: 587
     auth: true
     enable: true
+  amazonProperties:
+          endpointUrl:"https://s3.us-east-2.amazonaws.com"
+          accessKey:"AKIA3IWLEKV6AHBDUW4S"
+          secretKey:"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"
+          bucketName:"digitaxbucket"
   google:
     client: "345680725424-evurtenl54vsbg3t6foojaipi72h1ud1.apps.googleusercontent.com"
     geoLocationApi: "AIzaSyAXuBG4_9CkNw1UKgelmpQ6mUHabjwfyYk"
   facebook:
     clientId: "41279cccsafddscxv9156099930"
     clientSecret: "14695df9f165f3acbf04df3sdxzvsdxvcsdxczed45c98ca"
+   
 
 jasypt:
   encryptor:

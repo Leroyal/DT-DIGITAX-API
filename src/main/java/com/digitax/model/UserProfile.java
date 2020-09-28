@@ -35,11 +35,13 @@ public class UserProfile {
     @Column(name = "middleInitial")
     private String middleInitial;
     
+    @Column(name = "ocupation")
+    private String ocupation;
+    
     @Column(name = "dateofbirth")
     private Date dateofbirth;
     
     @Column(name = "consentToShareInformation")
-    @NotBlank
     @Size(max = 10)
     private boolean consentToShareInformation;
     
