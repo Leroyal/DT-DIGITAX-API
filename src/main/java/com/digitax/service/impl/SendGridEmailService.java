@@ -27,8 +27,9 @@ public class SendGridEmailService implements EmailService {
 	    Email to = new Email(toEmail);
 	    Content content = new Content("text/html", "{{email}}" + toEmail);
 	    
-	    personalization.addSubstitution("{{email}}",toEmail);
-	    
+	    //personalization.addSubstitution("{{email}}",toEmail);
+        personalization.addTo(to);
+        personalization.addDynamicTemplateData("{{email}}", toEmail);
 	    
 	    Mail mail = new Mail(from, subject, to, content);
 	    
