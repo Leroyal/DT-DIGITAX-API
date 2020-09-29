@@ -1,6 +1,7 @@
 package com.digitax.payload.request;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 import org.json.simple.JSONObject;
 
@@ -11,13 +12,16 @@ import lombok.Setter;
 @Setter
 public class UserTaxHistoryRequest {
 	@NotNull(message = "personalInfo required.")
-    private JSONObject ersonalInfo;
+    private JSONObject personalInfo;
     @NotNull(message = "income required.")
-    private Object income;
+    private JSONObject income;
     @NotNull(message = "TaxBreaks required.")
-    private Object taxBreaks;
+    private JSONObject taxBreaks;
     @NotNull(message = "PreviousYearSummary required.")
-    private Object previousYearSummary;
+    private JSONObject previousYearSummary;
+    @NotNull(message = "consentToShareInformation required.")
+    @Pattern(regexp = "^true$|^false$", message = "allowed input: true or false")
+    private String consentToShareInformation;
    
     
 }

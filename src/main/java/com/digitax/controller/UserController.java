@@ -2,21 +2,31 @@ package com.digitax.controller;
 
 
 import com.digitax.payload.ApiRes;
+import com.digitax.payload.request.ChangeEmailRequest;
+import com.digitax.payload.request.MarketingPreferenceRequest;
+import com.digitax.payload.request.UpdatePasswordRequest;
+import com.digitax.payload.request.UpdateProfileRequest;
 import com.digitax.payload.request.UserConsentRequest;
 import com.digitax.payload.request.UserDetailsRequest;
 import com.digitax.payload.request.UserTaxHistoryRequest;
 import com.digitax.security.jwt.JwtUtils;
 import com.digitax.security.jwt.UserSession;
 import com.digitax.constants.ResponseConstants;
+import com.digitax.model.MarketingPreference;
+import com.digitax.model.TaxHistory;
 import com.digitax.model.User;
 import com.digitax.model.UserAddress;
 import com.digitax.model.UserConsent;
 import com.digitax.model.UserProfile;
+import com.digitax.payload.response.TaxHistoryResponse;
 import com.digitax.payload.response.UserDetailsResponse;
 import com.digitax.repository.UserAddressRepository;
 import com.digitax.repository.UserConsentRepository;
 import com.digitax.repository.UserProfileRepository;
 import com.digitax.repository.UserRepository;
+import com.digitax.repository.MarketingPreferenceRepository;
+import com.digitax.repository.TaxHistoryRepository;
+import com.digitax.service.EmailService;
 import com.digitax.service.UserProfileService;
 
 import antlr.collections.List;
@@ -27,7 +37,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +48,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -77,7 +91,16 @@ public class UserController {
     
     @Autowired
     UserConsentRepository userConsentRepository;
-  
+    
+    
+    @Autowired
+    TaxHistoryRepository taxHistoryRepository;
+    
+    @Autowired
+    MarketingPreferenceRepository marketingPreferenceRepository;
+    
+    @Autowired
+    EmailService emailService;
 
 
     @SuppressWarnings("unchecked")
@@ -107,7 +130,7 @@ public class UserController {
 			 JSONObject statusObj = new JSONObject();
 		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
 		        statusObj.put("message", errors);
-		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
+		        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
         }
 		Optional<UserProfile> detailsObj = userProfileRepository.findByUserId(UserSession.getUserId());
     	Optional<User> user = userRepository.findById(UserSession.getUserId());
@@ -152,17 +175,13 @@ public class UserController {
     	 if(!detailsObj.isPresent()) {
     		    userDetailsObj.setUserId(UserSession.getUserId());
     		    userProfileRepository.save(userDetailsObj);
-    	        JSONObject statusObj = new JSONObject();
-    	        statusObj.put("status_code", ResponseConstants.SUCCESS);
-    	        statusObj.put("message", "SUCCESS");
+    	        
     	   }
     	 else
     	 {
     		userDetailsObj.setUserId(UserSession.getUserId());
     		userProfileService.updateDetails(userDetailsObj);
- 	        JSONObject statusObj = new JSONObject();
- 	        statusObj.put("status_code", ResponseConstants.SUCCESS);
- 	        statusObj.put("message", "SUCCESS");
+ 	        
     	 }
     	 
     	 Optional<UserProfile> userDetailsResp = userProfileRepository.findByUserId(UserSession.getUserId());
@@ -184,7 +203,8 @@ public class UserController {
 			 JSONObject statusObj = new JSONObject();
 		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
 		        statusObj.put("message", errors);
-		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
+		       
+		        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
         }
 		int year = Calendar.getInstance().get(Calendar.YEAR);
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -262,23 +282,79 @@ public class UserController {
 		         }
     }
 	
+	@SuppressWarnings("unchecked")
+	@GetMapping("/user-tax-history")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> getUserTaxHistory() {
+		try {
+		Optional<TaxHistory> detailsObj = taxHistoryRepository.findByUserId(UserSession.getUserId());
+		TaxHistory TaxObj = detailsObj.get();
+		TaxHistoryResponse RespObj =new TaxHistoryResponse(TaxObj);
+		JSONObject statusObj = new JSONObject();
+        statusObj.put("status_code", ResponseConstants.SUCCESS);
+        statusObj.put("message", "SUCCESS");
+        return new ResponseEntity<>(ApiRes.success(RespObj, statusObj), HttpStatus.OK);	
+		} 
+		catch (Exception e) {
+		  	   JSONObject statusObj = new JSONObject();
+		         statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+		         statusObj.put("message", "FAILURE");
+		         return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
+		         }
+    }
+	
+	
 	
 	@SuppressWarnings("unchecked")
 	@PostMapping("/user-tax-history")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> updateUserTaxHistory(@Valid @RequestBody UserTaxHistoryRequest taxHistory,BindingResult bindingResult) {
+    public ResponseEntity<?> updateUserTaxHistory(@Valid @RequestBody UserTaxHistoryRequest taxHistoryBody,BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
 			 JSONObject statusObj = new JSONObject();
 		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
 		        statusObj.put("message", errors);
-		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiRes.fail(statusObj));
+		        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
         }
 		try {
-			JSONObject statusObj = new JSONObject();
-	        statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
-	        statusObj.put("message", "FAILURE");
-	        return new ResponseEntity<>(ApiRes.success(null, statusObj), HttpStatus.OK);	
+			Optional<TaxHistory> detailsObj = taxHistoryRepository.findByUserId(UserSession.getUserId());
+			TaxHistory taxHistorytObj = new TaxHistory(
+					taxHistoryBody.getPersonalInfo().toString(),
+					taxHistoryBody.getIncome().toString(),
+					taxHistoryBody.getTaxBreaks().toString(),
+					taxHistoryBody.getPreviousYearSummary().toString(),
+					System.currentTimeMillis(),
+					taxHistoryBody.getConsentToShareInformation()
+	             );
+			if(!detailsObj.isPresent())
+			{
+				taxHistorytObj.setUserId(UserSession.getUserId());
+				TaxHistory obj = taxHistoryRepository.save(taxHistorytObj);
+				TaxHistoryResponse RespObj =new TaxHistoryResponse(obj);
+		        JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.SUCCESS);
+		        statusObj.put("message", "SUCCESS");
+		        return new ResponseEntity<>(ApiRes.success(RespObj, statusObj), HttpStatus.OK);	
+			}
+			else
+			{
+				taxHistoryRepository.updateTaxHistory(
+					  taxHistoryBody.getPersonalInfo().toString(),
+						taxHistoryBody.getIncome().toString(),
+						taxHistoryBody.getTaxBreaks().toString(),
+						taxHistoryBody.getPreviousYearSummary().toString(),
+						System.currentTimeMillis(),
+						taxHistoryBody.getConsentToShareInformation(),
+						UserSession.getUserId());
+			    Optional<TaxHistory> obj = taxHistoryRepository.findByUserId(UserSession.getUserId());
+			    TaxHistory TaxObj = obj.get();
+			    TaxHistoryResponse RespObj =new TaxHistoryResponse(TaxObj);
+				JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.SUCCESS);
+		        statusObj.put("message", "SUCCESS");
+		        return new ResponseEntity<>(ApiRes.success(RespObj, statusObj), HttpStatus.OK);	
+				
+			}
 		}
 		catch (Exception e) {
 		JSONObject statusObj = new JSONObject();
@@ -289,7 +365,171 @@ public class UserController {
     
 	}
 	
-
+	
+	@SuppressWarnings("unchecked")
+	@GetMapping("/user-marketing-preference")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> getMarketingPreference() {
+		try {
+		Optional<MarketingPreference> detailsObj = marketingPreferenceRepository.findByUserId(UserSession.getUserId());
+		MarketingPreference TaxObj = detailsObj.get();	
+		JSONObject statusObj = new JSONObject();
+        statusObj.put("status_code", ResponseConstants.SUCCESS);
+        statusObj.put("message", "SUCCESS");
+        return new ResponseEntity<>(ApiRes.success(TaxObj, statusObj), HttpStatus.OK);	
+		} 
+		catch (Exception e) {
+		  	   JSONObject statusObj = new JSONObject();
+		         statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+		         statusObj.put("message", "FAILURE");
+		         return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
+		         }
+    }
+	
+	
+	
+	@SuppressWarnings("unchecked")
+	@PostMapping("/user-marketing-preference")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> updateMarketingPreference(@Valid @RequestBody MarketingPreferenceRequest request,BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+			 JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", errors);
+		        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
+        }
+		try {
+			Optional<MarketingPreference> detailsObj = marketingPreferenceRepository.findByUserId(UserSession.getUserId());
+			MarketingPreference marketingPreferenceObj = new MarketingPreference(
+					request.getIsContactViaMailDisabled(),
+					request.getIsContactViaEmailDisabled(),
+					request.getIsContactViaPhoneDisabled(),
+					System.currentTimeMillis()
+	             );
+			if(!detailsObj.isPresent())
+			{
+				marketingPreferenceObj.setUserId(UserSession.getUserId());
+				MarketingPreference obj = marketingPreferenceRepository.save(marketingPreferenceObj);
+		        JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.SUCCESS);
+		        statusObj.put("message", "SUCCESS");
+		        return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);	
+			}
+			else
+			{
+				marketingPreferenceRepository.updateMarketingPref(
+						request.getIsContactViaMailDisabled(),
+						request.getIsContactViaEmailDisabled(),
+						request.getIsContactViaPhoneDisabled(),
+						System.currentTimeMillis(),
+						UserSession.getUserId());
+				JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.SUCCESS);
+		        statusObj.put("message", "SUCCESS");
+		        return new ResponseEntity<>(ApiRes.success(detailsObj, statusObj), HttpStatus.OK);	
+				
+			}
+		}
+		catch (Exception e) {
+		JSONObject statusObj = new JSONObject();
+        statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+        statusObj.put("message", "FAILURE");
+        return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
+		 }
+    
+	}
+	
+	@SuppressWarnings("unchecked")
+    @PostMapping("/update-email")
+    public ResponseEntity<?> updateemail(@Valid @RequestBody ChangeEmailRequest changeEmail,BindingResult bindingResult) {
+		try {
+    	if (userRepository.existsByEmail(changeEmail.getNewEmail())) {
+    		JSONObject statusObj = new JSONObject();
+	        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+	        statusObj.put("message", "User with this email already exists");
+	        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
+    	}
+    	else
+    	{	
+        userRepository.updateUserEmail(changeEmail.getNewEmail(),System.currentTimeMillis(),UserSession.getUserId());
+       	String emailData = emailService.changeEmailSupport("jayanta@redappletech.com",changeEmail.getNewEmail(),"Change of email");
+		System.out.println(emailData);
+       	JSONObject statusObj = new JSONObject();	      	
+        statusObj.put("status_code", ResponseConstants.SUCCESS);
+        statusObj.put("message", "SUCCESS");
+        return new ResponseEntity<>(ApiRes.success(null, statusObj), HttpStatus.OK);
+    	}    
+			}
+			catch (Exception e) {
+			JSONObject statusObj = new JSONObject();
+	        statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+	        statusObj.put("message", "FAILURE");
+	        return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
+			 }
+        
+    }
+	
+	@SuppressWarnings("unchecked")
+    @PostMapping("/update-profile")
+	@Transactional
+    public ResponseEntity<?> updateProfile(@Valid @RequestBody UpdateProfileRequest updateProfile,BindingResult bindingResult) {
+		try {
+	    Optional<UserProfile> UserProfile= userProfileRepository.findByUserId(UserSession.getUserId());
+	    if(!UserProfile.isPresent()) {
+	    	UserProfile userDetailsObj = new UserProfile();
+	    	userDetailsObj.setUserId(UserSession.getUserId());
+	    	userDetailsObj.setFirstName(updateProfile.getFirstName());
+	    	userDetailsObj.setLastName(updateProfile.getLastName());
+	    	userDetailsObj.setOcupation(updateProfile.getOcupation());
+	    	userDetailsObj.setDateofbirth(updateProfile.getDateofbirth());
+	    	
+	    	System.out.println(userDetailsObj);
+	    	
+	    	
+	    	userProfileService.saveUserProfile(userDetailsObj);
+	    }
+	    else
+	    {
+			    UserProfile userProfileObj = UserProfile.get();
+			    if(!updateProfile.getFirstName().isBlank())
+			    {
+			    	userProfileObj.setFirstName(updateProfile.getFirstName());
+			    }
+			    if(!updateProfile.getLastName().isBlank())
+			    {
+			    	userProfileObj.setLastName(updateProfile.getLastName());
+			    }
+			    if(!updateProfile.getOcupation().isBlank())
+			    {
+			    	userProfileObj.setOcupation(updateProfile.getOcupation());
+			    }
+			    if(updateProfile.getDateofbirth() != null)
+			    {
+			    	userProfileObj.setDateofbirth(updateProfile.getDateofbirth());
+			    }
+			    
+			    UserProfile author = userProfileRepository.findByUserId(UserSession.getUserId()).get(); 
+		        author.setFirstName("new name"); 
+		        author.setFirstName("new name"); 
+		    	System.out.println(author);
+			    userProfileRepository.save(userProfileObj);
+	    }
+       	JSONObject statusObj = new JSONObject();	      	
+        statusObj.put("status_code", ResponseConstants.SUCCESS);
+        statusObj.put("message", "SUCCESS");
+        return new ResponseEntity<>(ApiRes.success(null, statusObj), HttpStatus.OK);   
+			}
+			catch (Exception e) {
+				System.out.println(e);
+			JSONObject statusObj = new JSONObject();
+	        statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+	        statusObj.put("message", "FAILURE");
+	        return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
+			 }
+        
+    }
+	
 
     @GetMapping("/mod")
     @PreAuthorize("hasRole('MODERATOR')")

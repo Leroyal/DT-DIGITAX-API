@@ -2,9 +2,14 @@ package com.digitax.repository;
 
 import com.digitax.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 
 /**
@@ -24,5 +29,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	User findByEmail(String email);
 
 	User findByPhone(String phone);
+	
+	@Modifying
+    @Transactional 
+	@Query(value = "UPDATE users SET email = ?1, updated_at= ?2 WHERE id = ?3", nativeQuery = true)
+	public void updateUserEmail(String email,Long updatedAt, Long user_id);
 
 }

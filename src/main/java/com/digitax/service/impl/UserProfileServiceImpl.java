@@ -6,6 +6,7 @@ import com.digitax.service.UserProfileService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class UserProfileServiceImpl implements UserProfileService {
   
 
     @Override
+    @Transactional 
     public void saveUserProfile(UserProfile userProfile) {
     	userProfileRepository.save(userProfile);
     }
