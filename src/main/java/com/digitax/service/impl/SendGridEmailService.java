@@ -1,5 +1,6 @@
 package com.digitax.service.impl;
 
+import com.digitax.constants.MailConstants;
 import com.digitax.service.EmailService;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
@@ -19,25 +20,70 @@ import java.io.IOException;
 public class SendGridEmailService implements EmailService {
 	  @Autowired
 	  private SendGrid sendGrid;
+	  
+	  public String changeEmailSupport(String toEmail, String newEmail, String token, String UserName) {
+        Mail mail = new Mail();
+		Email fromEmail = new Email();
+		fromEmail.setName(MailConstants.emailSubject);
+		fromEmail.setEmail(MailConstants.fromEmial);
+		mail.setFrom(fromEmail);
+		mail.setTemplateId(MailConstants.CHANGE_EMALI_SUPPORT_EMAIL_ID);
 
-	  public String changeEmailSupport(String fromEmail, String toEmail, String subjectEmail) {
-	    Personalization personalization = new Personalization();
-	    Email from = new Email(fromEmail);
-	    String subject = subjectEmail;
-	    Email to = new Email(toEmail);
-	    Content content = new Content("text/html", "{{email}}" + toEmail);
-	    
-	    //personalization.addSubstitution("{{email}}",toEmail);
-        personalization.addTo(to);
-        personalization.addDynamicTemplateData("{{email}}", toEmail);
-	    
-	    Mail mail = new Mail(from, subject, to, content);
-	    
-	    mail.addPersonalization(personalization);
-	    mail.setReplyTo(new Email(fromEmail));
-	    mail.setTemplateId("d-5c2a42d58636413d922bd44cc6ff0be3");
+		Personalization personalization = new Personalization();
+		//This is the value that will be passed to the dynamic template in SendGrid
+		 personalization.addDynamicTemplateData("email", newEmail);  
+         personalization.addDynamicTemplateData("username", UserName);
+         personalization.addDynamicTemplateData("verifyUrl", MailConstants.baseUrl+"verify-email?email_token="+token);
+         personalization.addTo(new Email(toEmail));
+         mail.addPersonalization(personalization);
+        
+         sendMail(mail);
 
-	    Request request = new Request();
+	    return "email was successfully send";
+	  }
+	  
+	  public String changePasswordSupport(String toEmail , String UserName) {
+		   
+		            Mail mail = new Mail();
+		    		Email fromEmail = new Email();
+		    		fromEmail.setName(MailConstants.emailSubject);
+		    		fromEmail.setEmail(MailConstants.fromEmial);
+		    		mail.setFrom(fromEmail);
+		    		mail.setTemplateId(MailConstants.CHANGE_PASSWORD_SUPPORT_EMAIL_ID);
+
+		    		Personalization personalization = new Personalization();
+		    		//This is the value that will be passed to the dynamic template in SendGrid
+		    		personalization.addDynamicTemplateData("username", UserName);        
+		            personalization.addTo(new Email(toEmail));
+		            mail.addPersonalization(personalization);
+		    		
+		    		
+		            sendMail(mail);
+		    
+		    return "email was successfully send";
+		  }
+	  @Override
+		public String forgotPasswordSupport(String toEmail, String token, String username) {
+		  Mail mail = new Mail();
+			Email fromEmail = new Email();
+			fromEmail.setName(MailConstants.emailSubject);
+			fromEmail.setEmail(MailConstants.fromEmial);
+			mail.setFrom(fromEmail);
+			mail.setTemplateId(MailConstants.FORGOT_PASSWORD_SUPPORT_EMAIL_ID);
+
+			Personalization personalization = new Personalization();
+			//This is the value that will be passed to the dynamic template in SendGrid
+	         personalization.addDynamicTemplateData("username", username);
+	         personalization.addDynamicTemplateData("verifyUrl", MailConstants.baseUrl+"verify-forgot-password?password_token="+token);
+	         personalization.addTo(new Email(toEmail));
+	         mail.addPersonalization(personalization);
+	        
+	         sendMail(mail);
+
+		    return "email was successfully send";
+		}
+	private void sendMail(Mail mail) {
+		Request request = new Request();
 	    Response response;
 
 	    try {
@@ -54,7 +100,12 @@ public class SendGridEmailService implements EmailService {
 	      System.out.println(ex.getMessage());
 	    }
 
-	    return "email was successfully send";
-	  }
+		
+	}
+
+	
+	  
     	
 }
+
+

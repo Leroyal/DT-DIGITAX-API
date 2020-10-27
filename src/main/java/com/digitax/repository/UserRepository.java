@@ -6,12 +6,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.Optional;
 
-import javax.transaction.Transactional;
 
-
+import org.springframework.transaction.annotation.Transactional;
 /**
  * String provided framework to build a JPA based data access layer.
  */
@@ -34,5 +32,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional 
 	@Query(value = "UPDATE users SET email = ?1, updated_at= ?2 WHERE id = ?3", nativeQuery = true)
 	public void updateUserEmail(String email,Long updatedAt, Long user_id);
+
+	 
+	@Modifying 
+	@Transactional
+	@Query(value = "UPDATE users SET password = ?1, updated_at= ?2 WHERE email = ?3", nativeQuery = true)
+	public void updateUserPassword(String encode, long currentTimeMillis, String email);
 
 }

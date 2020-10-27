@@ -17,7 +17,7 @@ public class UserAddress {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private long id;
    
     
     @Column(name = "user_id")

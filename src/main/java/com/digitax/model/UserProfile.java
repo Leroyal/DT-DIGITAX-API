@@ -23,30 +23,29 @@ public class UserProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private long id;
    
     
     @Column(name = "user_id")
     private long userId;
 
-    @Column(name = "firstName")
-    private String firstName;
+    @Column(name = "userFirstName")
+    private String userFirstName;
 
-    @Column(name = "middleInitial")
-    private String middleInitial;
+    @Column(name = "userMiddleInitial")
+    private String userMiddleInitial;
     
-    @Column(name = "ocupation")
-    private String ocupation;
+    @Column(name = "userOcupation")
+    private String userOcupation;
     
-    @Column(name = "dateofbirth")
-    private Date dateofbirth;
+    @Column(name = "userDateofbirth")
+    private Date userDateofbirth;
     
     @Column(name = "consentToShareInformation")
-    @Size(max = 10)
     private boolean consentToShareInformation;
     
-    @Column(name = "lastName")
-    private String lastName;
+    @Column(name = "userLastName")
+    private String userLastName;
 
     @CreatedDate
     @Column(name = "created_at")
@@ -55,22 +54,15 @@ public class UserProfile {
     @LastModifiedDate
     @Column(name = "updated_at")
     private Long updatedAt;
-    
-    public UserProfile() {
-    }
-    public UserProfile(String firstName, String middleInitial, String lastName, Date dateofbirth,Long createdAt,boolean consentToShareInformation) {
-        this.firstName = firstName;
-        this.middleInitial = middleInitial;
-        this.lastName = lastName;
-        this.dateofbirth = dateofbirth;
-        this.createdAt = createdAt;
-        this.consentToShareInformation = consentToShareInformation;
-    }
+
 	@Override
 	public String toString() {
-		return "UserProfile [id=" + id + ", userId=" + userId + ", firstName=" + firstName + ", middleInitial="
-				+ middleInitial + ", dateofbirth=" + dateofbirth + ", lastName=" + lastName + ", createdAt=" + createdAt
-				+ ", updatedAt=" + updatedAt + "]";
+		return "UserProfile [id=" + id + ", userId=" + userId + ", userFirstName=" + userFirstName
+				+ ", userMiddleInitial=" + userMiddleInitial + ", userOcupation=" + userOcupation + ", userDateofbirth="
+				+ userDateofbirth + ", consentToShareInformation=" + consentToShareInformation + ", userLastName="
+				+ userLastName + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + "]";
 	}
+    
+	
 
 }

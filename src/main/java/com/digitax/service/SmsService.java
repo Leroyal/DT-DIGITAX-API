@@ -1,7 +1,9 @@
 package com.digitax.service;
 
-import com.twilio.rest.api.v2010.account.Message;
-
 public interface SmsService {
-	 void sendSMS(String to, String message);
+	   void sendSMS(String to, String message);
+
+	   void sendOTP(String string);
+
+	   Boolean verifyOTP(String string, String string2);
 }
