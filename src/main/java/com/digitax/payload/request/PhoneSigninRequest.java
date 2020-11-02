@@ -8,14 +8,18 @@ import lombok.Getter;
 import lombok.Setter;
 @Getter
 @Setter
-public class SigninRequest {
-	@NotBlank(message = "username can not be emppty.")
-	@NotNull(message = "username required.")
-    private String username;
-
-    @NotBlank(message = "password can not be emppty.")
-    @NotNull(message = "password required.")
-    private String password; 
+public class PhoneSigninRequest {
+	@NotBlank(message = "phone can not be emppty.")
+	@NotNull(message = "phone required.")
+    private String phone;
+    
+	@NotBlank(message = "countryCode can not be emppty.")
+    @NotNull(message = "countryCode required.")
+    private String countryCode; 
+	
+    @NotBlank(message = "otp can not be emppty.")
+    @NotNull(message = "otp required.")
+    private String otp; 
     
     @NotBlank(message = "deviceType can not be emppty.")
     @NotNull(message = "deviceType required.")

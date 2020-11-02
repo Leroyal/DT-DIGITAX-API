@@ -4,11 +4,11 @@ package com.digitax.controller;
 import com.digitax.payload.ApiRes;
 import com.digitax.payload.request.ChangeEmailRequest;
 import com.digitax.payload.request.MarketingPreferenceRequest;
-import com.digitax.payload.request.UpdatePasswordRequest;
 import com.digitax.payload.request.UpdateProfileRequest;
 import com.digitax.payload.request.UserConsentRequest;
 import com.digitax.payload.request.UserDetailsRequest;
 import com.digitax.payload.request.UserTaxHistoryRequest;
+import com.digitax.security.jwt.AuthEntryPointJwt;
 import com.digitax.security.jwt.JwtUtils;
 import com.digitax.security.jwt.UserSession;
 import com.digitax.constants.ResponseConstants;
@@ -28,10 +28,13 @@ import com.digitax.repository.MarketingPreferenceRepository;
 import com.digitax.repository.TaxHistoryRepository;
 import com.digitax.service.EmailService;
 import com.digitax.service.UserProfileService;
+import com.digitax.service.impl.UserProfileServiceImpl;
 
 import antlr.collections.List;
 
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +44,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,7 +52,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -66,6 +69,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/auth")
 public class UserController {
+    private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
 
 
     @Autowired
@@ -101,6 +105,10 @@ public class UserController {
     
     @Autowired
     EmailService emailService;
+    
+    
+    @Autowired 
+    UserProfileServiceImpl userProfileServiceImpl;
 
 
     @SuppressWarnings("unchecked")
@@ -145,13 +153,13 @@ public class UserController {
 			    userDetails.getCountry(),
 			    userDetails.getCountryCode(),
                 System.currentTimeMillis());
-    	 UserProfile userDetailsObj = new UserProfile(
-				    userDetails.getFirstName(),
-				    userDetails.getMiddleInitial(),
-				    userDetails.getLastName(),
-				    userDetails.getDateofbirth(),
-	                System.currentTimeMillis(),
-	                userDetails.isConsentToShareInformation());
+    	 UserProfile userDetailsObj = new UserProfile();
+    			 userDetailsObj.setUserFirstName(userDetails.getFirstName());
+    	         userDetailsObj.setUserMiddleInitial(userDetails.getMiddleInitial());
+    	         userDetailsObj.setUserLastName(userDetails.getLastName());  
+    	         userDetailsObj.setUserDateofbirth(userDetails.getDateofbirth());   
+    	         userDetailsObj.setCreatedAt(System.currentTimeMillis());
+    	         userDetailsObj.setConsentToShareInformation(userDetails.isConsentToShareInformation());
     	
     	if(!addressObj.isPresent()) {
     	     userAddressObj.setUserId(UserSession.getUserId());
@@ -407,6 +415,7 @@ public class UserController {
 					request.getIsContactViaPhoneDisabled(),
 					System.currentTimeMillis()
 	             );
+			
 			if(!detailsObj.isPresent())
 			{
 				marketingPreferenceObj.setUserId(UserSession.getUserId());
@@ -432,6 +441,10 @@ public class UserController {
 			}
 		}
 		catch (Exception e) {
+			System.out.println(e);
+	        System.out.println(TransactionAspectSupport.currentTransactionStatus().isRollbackOnly());
+	        
+	    	logger.debug("Is rollbackOnly: " + TransactionAspectSupport.currentTransactionStatus().isRollbackOnly());
 		JSONObject statusObj = new JSONObject();
         statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
         statusObj.put("message", "FAILURE");
@@ -440,88 +453,32 @@ public class UserController {
     
 	}
 	
-	@SuppressWarnings("unchecked")
-    @PostMapping("/update-email")
-    public ResponseEntity<?> updateemail(@Valid @RequestBody ChangeEmailRequest changeEmail,BindingResult bindingResult) {
-		try {
-    	if (userRepository.existsByEmail(changeEmail.getNewEmail())) {
-    		JSONObject statusObj = new JSONObject();
-	        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
-	        statusObj.put("message", "User with this email already exists");
-	        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
-    	}
-    	else
-    	{	
-        userRepository.updateUserEmail(changeEmail.getNewEmail(),System.currentTimeMillis(),UserSession.getUserId());
-       	String emailData = emailService.changeEmailSupport("jayanta@redappletech.com",changeEmail.getNewEmail(),"Change of email");
-		System.out.println(emailData);
-       	JSONObject statusObj = new JSONObject();	      	
-        statusObj.put("status_code", ResponseConstants.SUCCESS);
-        statusObj.put("message", "SUCCESS");
-        return new ResponseEntity<>(ApiRes.success(null, statusObj), HttpStatus.OK);
-    	}    
-			}
-			catch (Exception e) {
-			JSONObject statusObj = new JSONObject();
-	        statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
-	        statusObj.put("message", "FAILURE");
-	        return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
-			 }
-        
-    }
+	
 	
 	@SuppressWarnings("unchecked")
     @PostMapping("/update-profile")
 	@Transactional
     public ResponseEntity<?> updateProfile(@Valid @RequestBody UpdateProfileRequest updateProfile,BindingResult bindingResult) {
 		try {
-	    Optional<UserProfile> UserProfile= userProfileRepository.findByUserId(UserSession.getUserId());
-	    if(!UserProfile.isPresent()) {
-	    	UserProfile userDetailsObj = new UserProfile();
-	    	userDetailsObj.setUserId(UserSession.getUserId());
-	    	userDetailsObj.setFirstName(updateProfile.getFirstName());
-	    	userDetailsObj.setLastName(updateProfile.getLastName());
-	    	userDetailsObj.setOcupation(updateProfile.getOcupation());
-	    	userDetailsObj.setDateofbirth(updateProfile.getDateofbirth());
-	    	
-	    	System.out.println(userDetailsObj);
-	    	
-	    	
-	    	userProfileService.saveUserProfile(userDetailsObj);
-	    }
-	    else
-	    {
+		    Optional<UserProfile> UserProfile= userProfileRepository.findByUserId(UserSession.getUserId());
+		    if(!UserProfile.isPresent()) {
+				UserProfile userDetailsObj = new UserProfile();
+		    	userProfileServiceImpl.createUserProfile(userDetailsObj,updateProfile);
+		    }
+		    else
+		    {
 			    UserProfile userProfileObj = UserProfile.get();
-			    if(!updateProfile.getFirstName().isBlank())
-			    {
-			    	userProfileObj.setFirstName(updateProfile.getFirstName());
-			    }
-			    if(!updateProfile.getLastName().isBlank())
-			    {
-			    	userProfileObj.setLastName(updateProfile.getLastName());
-			    }
-			    if(!updateProfile.getOcupation().isBlank())
-			    {
-			    	userProfileObj.setOcupation(updateProfile.getOcupation());
-			    }
-			    if(updateProfile.getDateofbirth() != null)
-			    {
-			    	userProfileObj.setDateofbirth(updateProfile.getDateofbirth());
-			    }
-			    
-			    UserProfile author = userProfileRepository.findByUserId(UserSession.getUserId()).get(); 
-		        author.setFirstName("new name"); 
-		        author.setFirstName("new name"); 
-		    	System.out.println(author);
-			    userProfileRepository.save(userProfileObj);
-	    }
-       	JSONObject statusObj = new JSONObject();	      	
-        statusObj.put("status_code", ResponseConstants.SUCCESS);
-        statusObj.put("message", "SUCCESS");
-        return new ResponseEntity<>(ApiRes.success(null, statusObj), HttpStatus.OK);   
+			    userProfileServiceImpl.updateUserProfile(userProfileObj,updateProfile);
+		    }
+		    
+		    userProfileServiceImpl.createUpdateUserProfile(updateProfile);
+		    
+	       	JSONObject statusObj = new JSONObject();	      	
+	        statusObj.put("status_code", ResponseConstants.SUCCESS);
+	        statusObj.put("message", "SUCCESS");
+	        return new ResponseEntity<>(ApiRes.success(null, statusObj), HttpStatus.OK);   
 			}
 			catch (Exception e) {
-				System.out.println(e);
 			JSONObject statusObj = new JSONObject();
 	        statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
 	        statusObj.put("message", "FAILURE");

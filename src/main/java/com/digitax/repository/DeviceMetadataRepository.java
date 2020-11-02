@@ -10,7 +10,10 @@ import com.digitax.model.DeviceMetadata;
 public interface DeviceMetadataRepository extends JpaRepository<DeviceMetadata, Long> {
 	List<DeviceMetadata> findByUserId(Long userId);
 
-	DeviceMetadata findByHardwareAddress(long userId);
+	List<DeviceMetadata> findAllByHardwareAddress(String join);
 
 	DeviceMetadata findByHardwareAddress(String join);
+
+
+	DeviceMetadata findByUniqueSessionKey(String string);
 }

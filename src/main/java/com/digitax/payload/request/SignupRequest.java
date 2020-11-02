@@ -34,5 +34,6 @@ public class SignupRequest {
     
     @NotBlank(message = "deviceType can not be emppty.")
     @NotNull(message = "deviceType required.")
+    @Pattern(regexp = "^Android$|^iOS$|^Web$", message = "allowed input: Android, iOS, Web")
     private String deviceType;
 }

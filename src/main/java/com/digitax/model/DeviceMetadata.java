@@ -20,8 +20,10 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "device_metadata", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "hardwareAddress"),
+        @UniqueConstraint(columnNames = "uniqueSessionKey"),
 })
+
+//@Table(name = "device_metadata")
 @Getter
 @Setter
 public class DeviceMetadata {
@@ -30,6 +32,12 @@ public class DeviceMetadata {
     private int id;
 	@Column(name = "user_id")
     private long userId;
+	@Column(name = "userName")
+    private String userName;
+	@Column(name = "email")
+    private String email;
+	@Column(name = "phone")
+    private String phone;
 	@Column(name = "userAgent")
     private String userAgent;
 	@Column(name = "clientOS")
@@ -38,6 +46,8 @@ public class DeviceMetadata {
     private String clientIpAddr;
 	@Column(name = "clientIpAddr")
     private String clientBrowser;
+	@Column(name = "uniqueSessionKey")
+    private String uniqueSessionKey;
 	@Column(name = "hardwareAddress")
     private String hardwareAddress;
 	@Column(name = "isLoggedIn")

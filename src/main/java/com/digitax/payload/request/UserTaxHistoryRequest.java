@@ -20,7 +20,7 @@ public class UserTaxHistoryRequest {
     @NotNull(message = "PreviousYearSummary required.")
     private JSONObject previousYearSummary;
     @NotNull(message = "consentToShareInformation required.")
-    @Pattern(regexp = "^true$|^false$", message = "allowed input: true or false")
+    @Pattern(regexp = "^Android$|^iOS$|^Web$", message = "allowed input: Android, iOS, Web")
     private String consentToShareInformation;
    
     

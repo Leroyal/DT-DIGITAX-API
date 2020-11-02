@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@Api(tags = {"About Application"}, description = "s")
+@Api(tags = {"About Application"}, description = "About Application")
 public class AppController {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @RequestMapping(value = "/", method = RequestMethod.GET)

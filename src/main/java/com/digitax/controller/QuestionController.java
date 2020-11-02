@@ -27,7 +27,7 @@ public class QuestionController {
 	
 	@SuppressWarnings("unchecked")
 	@GetMapping("/question-categories")
-    public ResponseEntity<?> getUserTaxHistory() {
+    public ResponseEntity<?> getQuestionCategory() {
 		try {
 		List<QuestionCategories> QstnObj = questionCategoriesRepository.findAll();
 		JSONObject statusObj = new JSONObject();

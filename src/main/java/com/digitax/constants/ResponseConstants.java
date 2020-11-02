@@ -9,5 +9,4 @@ public interface ResponseConstants {
 	public final int INVALID_PASSWORD_FORMAT=401;
 	public final int INTERNAL_SERVER_ERROR=500;
 	public final int VALIDATION_ERROR=401;
-
 }

@@ -8,22 +8,22 @@ import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "question_categories")
+@Table(name = "tax_tips")
 @Getter
 @Setter
-public class QuestionCategories {
+public class TaxTips {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private long id;
    
     
 	@Column(name = "title")
     private String title;
 	
 	
-	@Column(name = "categoryLabel")
-    private String categoryLabel;
+	@Column(name = "taxTipLabel")
+    private String taxTipLabel;
 	 
     
 	@Column(name = "image")
@@ -31,6 +31,10 @@ public class QuestionCategories {
     
 	@Column(name = "numberOfQuestions")
     private String numberOfQuestions;
+	
+	
+	@Column(name = "is_visible")
+    private Boolean isVisible;
 
     
     @CreatedDate
@@ -41,7 +45,7 @@ public class QuestionCategories {
     @Column(name = "updated_at")
     private Long updatedAt;
     
-    public QuestionCategories() {
+    public TaxTips() {
     	
     }
 

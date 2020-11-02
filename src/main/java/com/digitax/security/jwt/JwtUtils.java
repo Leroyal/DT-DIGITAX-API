@@ -1,5 +1,6 @@
 package com.digitax.security.jwt;
 
+import com.digitax.model.User;
 import com.digitax.security.services.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
@@ -52,6 +53,25 @@ public class JwtUtils {
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
+    
+    public String generateJwtTokenByUser(User detailsObj, String deviceType) {
+   	 long jwtExpiry;
+   	if(deviceType.equals("IOS") || deviceType.equals("ANDROID")) {
+         jwtExpiry = jwtExpirationMs*360;
+         System.out.println(jwtExpiry);
+   	}
+   	else
+   	{
+   	 jwtExpiry = jwtExpirationMs;
+   	}
+       String id = String.valueOf(detailsObj.getId());
+		return Jwts.builder()
+               .setSubject(id)
+               .setIssuedAt(new Date())
+               .setExpiration(new Date((new Date()).getTime() + jwtExpiry))
+               .signWith(SignatureAlgorithm.HS512, jwtSecret)
+               .compact();
+   }
 
     /**
      * Method will extract username from JWT.

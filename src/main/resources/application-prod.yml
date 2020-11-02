@@ -1,6 +1,6 @@
 digitax:
   string:
-    hello: "PROD"
+    hello: "prod"
   constant:
     env: "DEV"
     host: "digitaxapi-env.eba-nrr834zb.us-east-1.elasticbeanstalk.com:8080"

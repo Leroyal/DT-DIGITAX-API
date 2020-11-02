@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.digitax.model.DeviceMetadata;
+import com.digitax.model.User;
 import com.digitax.repository.DeviceMetadataRepository;
 import com.digitax.security.jwt.UserSession;
 import com.digitax.service.DeviceMetadataService;
@@ -22,7 +23,7 @@ public class DeviceMetadataServiceImpl implements DeviceMetadataService {
 	
 	@Autowired
 	DeviceMetadataRepository deviceMetadataRepository;
-	public void saveUserActivity(HttpServletRequest request, long userId) throws SocketException {
+	public void saveUserActivity(HttpServletRequest request, long userId, User user) throws SocketException {
         final String clientIpAddr = getClientIpAddr(request);
         final String clientOS = getClientOS(request);
         final String clientBrowser = getClientBrowser(request);
@@ -42,7 +43,7 @@ public class DeviceMetadataServiceImpl implements DeviceMetadataService {
             }
             System.out.println(String.join("-", hardwareAddressDecode));
         }
-        DeviceMetadata deviceDetails = deviceMetadataRepository.findByHardwareAddress(String.join("-", hardwareAddressDecode));
+        DeviceMetadata deviceDetails = deviceMetadataRepository.findByUniqueSessionKey(user.getUsername()+String.join("-", hardwareAddressDecode)+clientBrowser);
         DeviceMetadata deviceDetailsObj =new DeviceMetadata();
         
         deviceDetailsObj.setClientBrowser(clientBrowser);
@@ -51,16 +52,30 @@ public class DeviceMetadataServiceImpl implements DeviceMetadataService {
         deviceDetailsObj.setClientIpAddr(clientIpAddr);
         deviceDetailsObj.setClientOS(clientOS);
         deviceDetailsObj.setIsLoggedIn(true);
+        deviceDetailsObj.setUserName(user.getUsername());
+        deviceDetailsObj.setEmail(user.getEmail());
+        deviceDetailsObj.setPhone(user.getPhone());
+        deviceDetailsObj.setUniqueSessionKey(user.getUsername()+String.join("-", hardwareAddressDecode)+clientBrowser);
         
         if(deviceDetails != null) {
+        	System.out.println("deviceDetails");
         	System.out.println(deviceDetails);
         	deviceDetails.setUpdatedAt(System.currentTimeMillis());
+        	deviceDetails.setClientBrowser(clientBrowser);
+        	deviceDetails.setHardwareAddress(String.join("-", hardwareAddressDecode));
+        	deviceDetails.setUserAgent(userAgent);
+        	deviceDetails.setClientIpAddr(clientIpAddr);
+        	deviceDetails.setClientOS(clientOS);
+        	deviceDetails.setIsLoggedIn(true);
+        	deviceDetails.setUserName(user.getUsername());
+        	deviceDetails.setEmail(user.getEmail());
+        	deviceDetails.setPhone(user.getPhone());
         	deviceMetadataRepository.save(deviceDetails);
         }
         else
         {
-        	System.out.println(deviceDetails);
         	deviceDetailsObj.setUserId(UserSession.getUserId());
+        	deviceDetailsObj.setCreatedAt(System.currentTimeMillis());
         	deviceMetadataRepository.save(deviceDetailsObj);
         }
         
@@ -160,5 +175,10 @@ public class DeviceMetadataServiceImpl implements DeviceMetadataService {
     public String getUserAgent(HttpServletRequest request) {
         return request.getHeader("User-Agent");
     }
+
+
+
+
+	
 
 }
