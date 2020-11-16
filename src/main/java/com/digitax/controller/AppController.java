@@ -16,6 +16,10 @@ import java.util.Map;
 public class AppController {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @RequestMapping(value = "/", method = RequestMethod.GET)
+    
+    /*
+     * Version of the APP
+     */
     public Map version() {
         return new HashMap() {{
             put("version", "0.1.0");

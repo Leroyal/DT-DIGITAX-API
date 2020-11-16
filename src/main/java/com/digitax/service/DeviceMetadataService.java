@@ -8,6 +8,6 @@ import com.digitax.model.User;
 
 public interface DeviceMetadataService {
 
-	void saveUserActivity(HttpServletRequest request, long l, User string) throws SocketException;
+	void saveUserActivity(HttpServletRequest request, long l, User string, String uniqueId) throws SocketException;
 
 }

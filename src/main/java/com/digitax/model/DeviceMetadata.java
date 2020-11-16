@@ -48,8 +48,8 @@ public class DeviceMetadata {
     private String clientBrowser;
 	@Column(name = "uniqueSessionKey")
     private String uniqueSessionKey;
-	@Column(name = "hardwareAddress")
-    private String hardwareAddress;
+	@Column(name = "uniqueId")
+    private String uniqueId;
 	@Column(name = "isLoggedIn")
     private Boolean isLoggedIn;
     @CreatedDate

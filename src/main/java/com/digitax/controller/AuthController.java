@@ -127,6 +127,9 @@ public class AuthController {
      * 
      * @param loginRequest
      * @return
+     * Used JWT for session checking Please find the file on package security.jwt and jwtutils class for refrence of token creation
+     * Used Spring boot default authentication for veryfing user and authenticatio- manager 
+     * Used UserProfileServiceImpl service for user model access
      */
     @SuppressWarnings("unchecked")
     @PostMapping("/signin")
@@ -194,7 +197,7 @@ public class AuthController {
             statusObj.put("status_code", 200);
             statusObj.put("message", "SUCCESS");
             
-            devideMetadataService.saveUserActivity(request,UserSession.getUserId(), detailsObjUserAftrLogin);
+            devideMetadataService.saveUserActivity(request,UserSession.getUserId(), detailsObjUserAftrLogin,loginRequest.getUniqueId());
 	        
             return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
        } catch (Exception e) {
@@ -254,7 +257,7 @@ public class AuthController {
             statusObj.put("status_code", 200);
             statusObj.put("message", "SUCCESS");
             
-            devideMetadataService.saveUserActivity(request,detailsObj.getId(), detailsObj);
+            devideMetadataService.saveUserActivity(request,detailsObj.getId(), detailsObj, loginRequest.getUniqueId());
 	        
             return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
 	    	}
@@ -405,7 +408,12 @@ public class AuthController {
         }
     }
     
-    
+    /**##
+     * 
+     * @param request
+     * @param response
+     * @return
+     */
     @SuppressWarnings("unchecked")
     @PostMapping("/signout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
@@ -422,6 +430,7 @@ public class AuthController {
     
     @SuppressWarnings("unchecked")
     @PostMapping("/update-password")
+    
     public ResponseEntity<?> updatePassword(@Valid @RequestBody UpdatePasswordRequest request,BindingResult bindingResult) {
     	if (bindingResult.hasErrors()) {
 			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
@@ -452,7 +461,12 @@ public class AuthController {
         
     }
     
-    
+    /**##
+     * 
+     * @param request
+     * @param bindingResult
+     * @return
+     */
     @SuppressWarnings("unchecked")
     @PostMapping("/change-password")
     @PreAuthorize("hasRole('USER')")
@@ -494,6 +508,12 @@ public class AuthController {
 			 }
         }
     
+    /**##
+     * 
+     * @param request
+     * @param bindingResult
+     * @return
+     */
     @SuppressWarnings("unchecked")
     @PostMapping("/send-otp")
     public ResponseEntity<?> SendOtp(@Valid @RequestBody SendOtpRequest request,BindingResult bindingResult) {
@@ -519,6 +539,12 @@ public class AuthController {
 			 }	      
           }
     
+    /**##
+     * 
+     * @param request
+     * @param bindingResult
+     * @return
+     */
     @SuppressWarnings("unchecked")
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@Valid @RequestBody VerifyOtpRequest request,BindingResult bindingResult) {
@@ -546,6 +572,11 @@ public class AuthController {
 			 }	      
           }
     
+    
+    /**##
+     * 
+     * @return
+     */
     @SuppressWarnings("unchecked")
 	@GetMapping("/user-account-activity")
     @PreAuthorize("hasRole('USER')")
@@ -565,27 +596,16 @@ public class AuthController {
 		         }
     }
     
-    
+    /**##
+     * 
+     * @param uniqueId
+     * @return
+     */
     @SuppressWarnings("unchecked")
-	@GetMapping("/user-account-activity-by-device")
-    public ResponseEntity<?> getUserAccountActivityByDevice(HttpServletRequest request) {
+	@GetMapping("/user-account-activity-by-device/{uniqueId}")
+    public ResponseEntity<?> getUserAccountActivityByDevice(@PathVariable String uniqueId) {
 		try {
-			InetAddress localHost = null;
-			try {
-				localHost = InetAddress.getLocalHost();
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-			}
-	        NetworkInterface ni = NetworkInterface.getByInetAddress(localHost);
-	        byte[] hardwareAddress = ni.getHardwareAddress();
-	        String[] hardwareAddressDecode = new String[hardwareAddress.length];
-	        if (hardwareAddress != null) {
-	            for (int i = 0; i < hardwareAddress.length; i++) {
-	            	hardwareAddressDecode[i] = String.format("%02X", hardwareAddress[i]);
-	            }
-	            System.out.println(String.join("-", hardwareAddressDecode));
-	        }
-	    List<DeviceMetadata> deviceDetails = deviceMetadataRepository.findAllByHardwareAddress(String.join("-", hardwareAddressDecode));
+	    List<DeviceMetadata> deviceDetails = deviceMetadataRepository.findAllByUniqueId(uniqueId);
 		JSONObject statusObj = new JSONObject();
         statusObj.put("status_code", ResponseConstants.SUCCESS);
         statusObj.put("message", "SUCCESS");
@@ -599,6 +619,37 @@ public class AuthController {
 		         }
     }
     
+    /**##
+     * 
+     * @param uniqueId
+     * @param userName
+     * @return
+     */
+    @Transactional
+    @SuppressWarnings("unchecked")
+	@DeleteMapping("/clear-cache/{uniqueId}/{userName}")
+	public ResponseEntity<?> deleteUserData(@PathVariable String uniqueId,@PathVariable String userName ) {
+		try {
+	    deviceMetadataRepository.deleteByUniqueIdandUserName(uniqueId,userName);
+	    JSONObject statusObj = new JSONObject();
+        statusObj.put("status_code", ResponseConstants.SUCCESS);
+        statusObj.put("message", "SUCCESS");
+        return new ResponseEntity<>(ApiRes.success(null, statusObj), HttpStatus.OK);
+		}
+	    catch (Exception e) {
+		  	   JSONObject statusObj = new JSONObject();
+		         statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+		         statusObj.put("message", "FAILURE");
+		         return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
+		         }
+	}
+    
+    /**##
+     * 
+     * @param changeEmail
+     * @param bindingResult
+     * @return
+     */
     @SuppressWarnings("unchecked")
     @PostMapping("/change-email")
     public ResponseEntity<?> changeEmail(@Valid @RequestBody ChangeEmailRequest changeEmail,BindingResult bindingResult) {
@@ -656,6 +707,13 @@ public class AuthController {
         
     }
     
+    /**##
+     * 
+     * @param ChangeEmailRequest
+     * @param bindingResult
+     * @return
+     */
+    
     @SuppressWarnings("unchecked")
     @PostMapping("/verify-change-email")
     public ResponseEntity<?> verifyChangeEmail(@Valid @RequestBody VerifyChangeEmailRequest ChangeEmailRequest,BindingResult bindingResult) {
@@ -705,6 +763,14 @@ public class AuthController {
         
     }
     
+    
+    /**##
+     * 
+     * @param forgotPassword
+     * @param bindingResult
+     * @return
+     */
+    
     @SuppressWarnings("unchecked")
     @PostMapping("/forgot-password-request")
     public ResponseEntity<?> forgotPasswordRequest(@Valid @RequestBody ForgotPasswordRequest forgotPassword,BindingResult bindingResult) {
@@ -751,6 +817,13 @@ public class AuthController {
         
     }
     
+    
+    /**##
+     * 
+     * @param forgotPassword
+     * @param bindingResult
+     * @return
+     */
     @SuppressWarnings("unchecked")
     @PostMapping("/forgot-password-verify")
     public ResponseEntity<?> forgotPasswordVerify(@Valid @RequestBody VerifyChangePassword forgotPassword,BindingResult bindingResult) {

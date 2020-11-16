@@ -16,12 +16,23 @@ public class BucketController {
 	@Autowired
     AmazonClient amazonClient;
 
-    
+	 /**##
+	  * 
+	  * @param file
+	  * @return
+	  * Used AWS s3 bucket to upload file And it's default library to upload
+	  */
     @PostMapping("/upload-file")
     public String uploadFile(@RequestPart(value = "file") MultipartFile file) {
         return this.amazonClient.uploadFile(file);
     }
-
+    
+    /**##
+     * 
+     * @param fileUrl
+     * @return
+     *  Used AWS s3 bucket to upload file And it's default library to upload
+     */
     @DeleteMapping("/delete-file")
     public String deleteFile(@RequestPart(value = "url") String fileUrl) {
         return this.amazonClient.deleteFileFromS3Bucket(fileUrl);

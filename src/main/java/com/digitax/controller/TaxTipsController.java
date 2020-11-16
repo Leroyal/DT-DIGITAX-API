@@ -150,7 +150,7 @@ public class TaxTipsController {
     }
 	
 	@SuppressWarnings("unchecked")
-	@DeleteMapping("/products/{id}")
+	@DeleteMapping("/tax-tips/{id}")
 	public ResponseEntity<?> deleteTaxTips(@PathVariable long id) {
 		try {
 		taxTipsRepository.deleteById(id);

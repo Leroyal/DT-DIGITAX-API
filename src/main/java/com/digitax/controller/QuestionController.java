@@ -24,7 +24,10 @@ public class QuestionController {
 	@Autowired
 	QuestionCategoriesRepository questionCategoriesRepository;
 	
-	
+	/**##
+	 * This controller used for retrive saved question category list
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	@GetMapping("/question-categories")
     public ResponseEntity<?> getQuestionCategory() {
