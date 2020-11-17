@@ -1,5 +1,8 @@
 package com.digitax.service.impl;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -23,31 +26,34 @@ public class DeviceMetadataServiceImpl implements DeviceMetadataService {
 	
 	@Autowired
 	DeviceMetadataRepository deviceMetadataRepository;
-	public void saveUserActivity(HttpServletRequest request, long userId, User user) throws SocketException {
-        final String clientIpAddr = getClientIpAddr(request);
+	public void saveUserActivity(HttpServletRequest request, long userId, User user,String uniqueId ) throws SocketException {
+        final String clientIpAddr = getClientIPAddress(request);
         final String clientOS = getClientOS(request);
         final String clientBrowser = getClientBrowser(request);
         final String userAgent = getUserAgent(request);
+        final String userMac = getClientMACAddress(clientIpAddr);
+        System.out.println("userMac");
+        System.out.println(userMac);
         InetAddress localHost = null;
 		try {
 			localHost = InetAddress.getLocalHost();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
-        NetworkInterface ni = NetworkInterface.getByInetAddress(localHost);
-        byte[] hardwareAddress = ni.getHardwareAddress();
-        String[] hardwareAddressDecode = new String[hardwareAddress.length];
-        if (hardwareAddress != null) {
-            for (int i = 0; i < hardwareAddress.length; i++) {
-            	hardwareAddressDecode[i] = String.format("%02X", hardwareAddress[i]);
-            }
-            System.out.println(String.join("-", hardwareAddressDecode));
-        }
-        DeviceMetadata deviceDetails = deviceMetadataRepository.findByUniqueSessionKey(user.getUsername()+String.join("-", hardwareAddressDecode)+clientBrowser);
+//        NetworkInterface ni = NetworkInterface.getByInetAddress(localHost);
+//        byte[] hardwareAddress = ni.getHardwareAddress();
+//        String[] hardwareAddressDecode = new String[hardwareAddress.length];
+//        if (hardwareAddress != null) {
+//            for (int i = 0; i < hardwareAddress.length; i++) {
+//            	hardwareAddressDecode[i] = String.format("%02X", hardwareAddress[i]);
+//            }
+//            System.out.println(String.join("-", hardwareAddressDecode));
+//        }
+        DeviceMetadata deviceDetails = deviceMetadataRepository.findByUniqueSessionKey(user.getUsername()+uniqueId+clientBrowser);
         DeviceMetadata deviceDetailsObj =new DeviceMetadata();
         
         deviceDetailsObj.setClientBrowser(clientBrowser);
-        deviceDetailsObj.setHardwareAddress(String.join("-", hardwareAddressDecode));
+        deviceDetailsObj.setUniqueId(uniqueId);
         deviceDetailsObj.setUserAgent(userAgent);
         deviceDetailsObj.setClientIpAddr(clientIpAddr);
         deviceDetailsObj.setClientOS(clientOS);
@@ -55,14 +61,14 @@ public class DeviceMetadataServiceImpl implements DeviceMetadataService {
         deviceDetailsObj.setUserName(user.getUsername());
         deviceDetailsObj.setEmail(user.getEmail());
         deviceDetailsObj.setPhone(user.getPhone());
-        deviceDetailsObj.setUniqueSessionKey(user.getUsername()+String.join("-", hardwareAddressDecode)+clientBrowser);
+        deviceDetailsObj.setUniqueSessionKey(user.getUsername()+uniqueId+clientBrowser);
         
         if(deviceDetails != null) {
         	System.out.println("deviceDetails");
         	System.out.println(deviceDetails);
         	deviceDetails.setUpdatedAt(System.currentTimeMillis());
         	deviceDetails.setClientBrowser(clientBrowser);
-        	deviceDetails.setHardwareAddress(String.join("-", hardwareAddressDecode));
+        	deviceDetails.setUniqueId(uniqueId);
         	deviceDetails.setUserAgent(userAgent);
         	deviceDetails.setClientIpAddr(clientIpAddr);
         	deviceDetails.setClientOS(clientOS);
@@ -86,9 +92,37 @@ public class DeviceMetadataServiceImpl implements DeviceMetadataService {
                             "Browser Name\t" + clientBrowser + "\n" +
                             "IP Address\t" + clientIpAddr + "\n");
     }
+    
+	
+	
+	public String getClientMACAddress(String clientIp){ 
+	     String str = ""; 
+	     String macAddress = ""; 
+	     try { 
+	          Process p = Runtime.getRuntime().exec("nbtstat -A " + clientIp); 
+	          InputStreamReader ir = new InputStreamReader(p.getInputStream()); 
+	          LineNumberReader input = new LineNumberReader(ir); 
+	          for (int i = 1; i <100; i++) { 
+	               str = input.readLine(); 
+	               if (str != null) { 
+	                    if (str.indexOf("MAC Address") > 1) { 
+	                         macAddress = str.substring(str.indexOf("MAC Address") + 14, str.length()); 
+	                         break; 
+	                    } 
+	               } 
+	          } 
+	     } catch (IOException e) { 
+	          e.printStackTrace(System.out); 
+	     } 
+	     return macAddress; 
+	}
 
-
-   
+	public String getClientIPAddress(HttpServletRequest request) { 
+	     if (request.getHeader("x-forwarded-for") == null) { 
+	          return request.getRemoteAddr(); 
+	     } 
+	     return request.getHeader("x-forwarded-for"); 
+	}
 
     public String getClientIpAddr(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");

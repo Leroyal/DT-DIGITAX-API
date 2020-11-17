@@ -1,9 +1,3 @@
-{
-    "username": "JayantaPA",
-    "password": "123456",
-    "deviceType":"IOS"
-}# DT-DIGITAX-API
-
 DigiTax is the #1 tax preparation software in the world to file taxes online. Easily file federal and state
 income tax returns with 100% accurate Expert Approved Guarantee. 
 
@@ -15,12 +9,9 @@ income tax returns with 100% accurate Expert Approved Guarantee.
 * [Technologies](#technologies)
     * [Java](#java)    
     * [Sprint Boot](#spring-boot)
+    * [SQL](#SQL)
 * <details>
     <summary>DIGITAX API</summary>
-
-    * [Sign Up](#sign-up)
-    * [Sign In](#sign-in)
-    * [Sign Out](#sign-out)
 </details>    
 
 * [CHANGELOG](#changelog)
@@ -83,6 +74,19 @@ Some features and advantages are:
 
 Source: [https://spring.io/projects/spring-boot](https://spring.io/projects/spring-boot)
 
+<a name="SQL"></a>
+### SQL
+
+1. SQL is a standard language for accessing and manipulating databases.
+Some features and advantages are:
+
+    * SQL can execute queries against a database
+    * SQL can retrieve data from a database
+    * SQL can insert records in a database
+    * SQL can update records in a database
+   
+Source: [https://www.mysql.com](https://www.mysql.com)
+
 
 <!-- ************************* -->
 <!--    DIGITAX API SECTION    -->
@@ -90,441 +94,42 @@ Source: [https://spring.io/projects/spring-boot](https://spring.io/projects/spri
 ## DIGITAX API
 The base URL for DIGITAX: http://52.6.241.241/.
 
-### Sign In
-Endpoint: `http://digitaxapi-env.eba-nrr834zb.us-east-1.elasticbeanstalk.com:8080/api/auth/signin`
+The base URL for DIGITAX Swagger:http://digitaxapi-env.eba-nrr834zb.us-east-1.elasticbeanstalk.com:8080/swagger-ui.html#/
 
-API endpoint for user registration.
+## Eclipse Instructions
+Prerequisites:
 
-| Code | Description              | Links    |
-|------|--------------------------|----------|
-| 200  | CREATE_SUCCESS           | No Links |
-| 400  | USER_ALREADY_EXISTS      | No Links |
-| 401  | INVALID_EMAIL_FORMAT     | No Links |
-| 401  | INVALID_PASSWORD_FORMAT  | No Links |
-| 500  | INTERNAL_SERVER_ERROR    | No Links |
+Install Eclipse, the Maven plugin, and optionally the GitHub plugin.
+Set up Eclipse Preferences
 
-<details>
-    <summary>POST Request Body: </summary>
+Window > Preferences... (or on Mac, Eclipse > Preferences...)
 
-```json
-{
-    "username": "JayantaPA",
-    "password": "123456",
-    "deviceType":"IOS"
-}
-```
-</details>
-<details>
-    <summary>Response:</summary>
+Select Maven
 
-```json
-{
-    "status": {
-        "status_code": 200,
-        "message": "SUCCESS"
-    },
-    "data": {
-        "user": {
-            "id": 2,
-            "email": "jayanta.5045ddd@gmail.com",
-            "authorities": [
-                {
-                    "authority": "ROLE_USER"
-                }
-            ],
-            "username": "JayantaPA"
-        },
-        "session": {
-            "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNTk4Mjc4NjE1LCJleHAiOjE1OTkzMTc4NDR9.sF-KjmLt8aSTdjoRZPCA84UOwLF0_5YkcQaXGoiIvN9C3ZxDLm3R4zojnl0uNvJOWVVocOnJt2nwXLbPaQnNOw",
-            "expirationMiliSecond": 1039228928,
-            "utcExpirationTime": "2020-09-05T14:57:24.487+00:00",
-            "ptExpirationTime": "2020-09-05T14:57:24.487+00:00"
-        }
-    }
-}
-```
-</details>
+check on "Download Artifact Sources"
+check on "Download Artifact JavaDoc"
+Create a new project using storage/xml-api/cmdline-sample
 
-[table of contents](#table-of-contents)
+Create a new Java Project.
+Choose the Location of the project to be the location of cmdline-sample
+Select the project and Convert to Maven Project to add Maven Dependencies.
+Click on Run > Run configurations
+Navigate to your Java Application's configuration section
 
-### Sign Up 
-Endpoint: `http://digitaxapi-env.eba-nrr834zb.us-east-1.elasticbeanstalk.com:8080/api/auth/signup`
+Run
 
-API endpoint for user authentication.
+Right-click on project
+Run As > Spring boot App
 
-| Code | Description             | Links    |
-|------|-------------------------|----------|
-| 200  | SUCCESS                 | No Links |
-| 401  | WRONG_EMAIL_OR_PASSWORD | No Links |
-| 401  | INVALID_EMAIL_FORMAT    | No Links |
-| 401  | INVALID_PASSWORD_FORMAT | No Links |
+## Run in Live
+Create a buid by Run as > Maven build
+before it please check all theconfugration file set to live credentials
 
-<details>
-    <summary>POST Request Body:</summary>
+We have used Beanstalk and RDS of AWS for Digitax
 
-```json
-{
-    "username": "JayantaPn6",
-    "email": "jayanta.5045dddd@gmail.com",
-    "password": "1234567",
-    "phone": "7008283103",
-    "deviceType":"IOS"
-}
-```
-</details>
-<details>
-    <summary>Response:</summary>
+Login to bean stalk and uplaod the build 
 
-```json
-{
-    "status": {
-        "status_code": 200,
-        "message": "SUCCESS"
-    },
-    "data": {
-        "user": {
-            "id": 2,
-            "email": "jayanta.5045ddd@gmail.com",
-            "authorities": [
-                {
-                    "authority": "ROLE_USER"
-                }
-            ],
-            "username": "JayantaPA"
-        },
-        "session": {
-            "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNTk4Mjc4NjE1LCJleHAiOjE1OTkzMTc4NDR9.sF-KjmLt8aSTdjoRZPCA84UOwLF0_5YkcQaXGoiIvN9C3ZxDLm3R4zojnl0uNvJOWVVocOnJt2nwXLbPaQnNOw",
-            "expirationMiliSecond": 1039228928,
-            "utcExpirationTime": "2020-09-05T14:57:24.487+00:00",
-            "ptExpirationTime": "2020-09-05T14:57:24.487+00:00"
-        }
-    }
-}
-```
-</details>
-
-[table of contents](#table-of-contents)
-
-### Sign Out 
-Endpoint: `/api/auth/signout`
-
-API endpoint to end user session.
-
-| Code | Description           | Links    |
-|------|-----------------------|----------|
-| 200  | SUCCESS               | No Links |
-| 500  | INTERNAL_SERVER_ERROR | No Links |
-
-<details>
-    <summary>POST Request Body:</summary>
-
-```json
-{
-  "accessToken": "07ywyJ6TdsMLOSh2GTfq328VyYEg6C3L"
-}
-```
-</details>
-<details>
-    <summary>Response:</summary>
-
-```json
-{}
-```
-</details>
-
-
-### User Details
-Endpoint: `http://digitaxapi-env.eba-nrr834zb.us-east-1.elasticbeanstalk.com:8080/api/auth/user-details`
-
-API endpoint to end user session.
-
-| Code | Description           | Links    |
-|------|-----------------------|----------|
-| 200  | SUCCESS               | No Links |
-| 500  | INTERNAL_SERVER_ERROR | No Links |
-
-<details>
-    <summary>GET Request Header:</summary>
-
-```json
-{
-  "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNTk2Nzk5OTQ3LCJleHAiOjE1OTY4ODYzNDd9.w19Ve8UJez0w9kRGjy7zcYnj_docW9TyYSRmR_9sANzobO8RIaxSUVipkCt6he1uwMILzhBtrC26WV0dPXE_Tg"
-}
-```
-</details>
-<details>
-    <summary>Response:</summary>
-
-```json
-{
-    "status": {
-        "status_code": 200,
-        "message": "SUCCESS"
-    },
-    "data": {
-        "user": {
-            "id": 2,
-            "username": "JayantaPA",
-            "email": "jayanta.5045ddd@gmail.com",
-            "password": "$2a$10$zYIVsFlyqytFOPuUeyDxKuTxsHUT0w3rl1Jy9yuXz1EqprJ6/lMEy",
-            "phone": "80189442589",
-            "roles": [
-                {
-                    "id": 1,
-                    "name": "ROLE_USER"
-                }
-            ],
-            "is_deleted": 0,
-            "is_active": 0,
-            "isVerifiedEmail": 0,
-            "isVerifiedPhone": 0,
-            "createdAt": 1596733799716,
-            "deletedAt": null,
-            "updatedAt": null
-        },
-        "userDetails": {
-            "id": 1,
-            "userId": 2,
-            "firstName": "Jayanta",
-            "middleInitial": "Kumar",
-            "dateofbirth": "2020-05-25T18:21:11.000+00:00",
-            "consentToShareInformation": true,
-            "lastName": "panigrahi",
-            "createdAt": 1596733799716,
-            "consentToShareInformation": false,
-            "updatedAt": 1598449945503
-        },
-        "userAddress": {
-            "id": 7,
-            "userId": 2,
-            "addressLine1": "kasabajayapur",
-            "addressLine2": "khantapada",
-            "city": "balasore",
-            "state": "Odisha",
-            "stateCode": 756043,
-            "postalCode": 788,
-            "country": "india",
-            "countryCode": 91,
-            "createdAt": 1597326665442,
-            "updatedAt": 1598449945503
-        }
-    }
-}
-```
-</details>
-
-### Update User Details
-Endpoint: `/api/auth/user-details`
-
-API endpoint to end user session.
-
-| Code | Description           | Links    |
-|------|-----------------------|----------|
-| 200  | SUCCESS               | No Links |
-| 500  | INTERNAL_SERVER_ERROR | No Links |
-
-<details>
-    <summary>PUT Request Header:</summary>
-
-```json
-{
-  "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNTk2Nzk5OTQ3LCJleHAiOjE1OTY4ODYzNDd9.w19Ve8UJez0w9kRGjy7zcYnj_docW9TyYSRmR_9sANzobO8RIaxSUVipkCt6he1uwMILzhBtrC26WV0dPXE_Tg"
-}
-```
-```json
-     {
-        "firstName": "Jayanta",
-        "middleInitial": "Kumar",
-        "lastName": "panigrahi",
-        "dateofbirth": "2020-05-25T18:21:11.000+00:00",
-        "addressLine1": "kasabajayapur",
-        "addressLine2": "khantapada",
-        "city": "balasore",
-        "state": "Odisha",
-        "stateCode": "756043",
-        "countryCode":"+91",
-        "postalCode":"+788",
-        "country":"india",
-        "consentToShareInformation":false
-    }
-```
-</details>
-<details>
-    <summary>Response:</summary>
-
-```json
-{
-    "status": {
-        "status_code": 200,
-        "message": "SUCCESS"
-    },
-    "data": {
-        "user": {
-            "id": 2,
-            "username": "JayantaPA",
-            "email": "jayanta.5045ddd@gmail.com",
-            "password": "$2a$10$zYIVsFlyqytFOPuUeyDxKuTxsHUT0w3rl1Jy9yuXz1EqprJ6/lMEy",
-            "phone": "80189442589",
-            "roles": [
-                {
-                    "id": 1,
-                    "name": "ROLE_USER"
-                }
-            ],
-            "is_deleted": 0,
-            "is_active": 0,
-            "isVerifiedEmail": 0,
-            "isVerifiedPhone": 0,
-            "createdAt": 1596733799716,
-            "deletedAt": null,
-            "updatedAt": null
-        },
-        "userDetails": {
-            "id": 1,
-            "userId": 2,
-            "firstName": "Jayanta",
-            "middleInitial": "Kumar",
-            "dateofbirth": "2020-05-25T18:21:11.000+00:00",
-            "consentToShareInformation": true,
-            "lastName": "panigrahi",
-            "createdAt": 1596733799716,
-            "updatedAt": 1598449945503
-        },
-        "userAddress": {
-            "id": 7,
-            "userId": 2,
-            "addressLine1": "kasabajayapur",
-            "addressLine2": "khantapada",
-            "city": "balasore",
-            "state": "Odisha",
-            "stateCode": 756043,
-            "postalCode": 788,
-            "country": "india",
-            "countryCode": 91,
-            "createdAt": 1597326665442,
-            "updatedAt": 1598449945503
-        }
-    }
-}
-```
-</details>
-
-
-### User Consent API
-Endpoint: `/api/auth/user-consents`
-
-API endpoint to end user session.
-
-| Code | Description           | Links    |
-|------|-----------------------|----------|
-| 200  | SUCCESS               | No Links |
-| 500  | INTERNAL_SERVER_ERROR | No Links |
-
-<details>
-    <summary>POST Request Header:</summary>
-
-```json
-{
-  "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNTk2Nzk5OTQ3LCJleHAiOjE1OTY4ODYzNDd9.w19Ve8UJez0w9kRGjy7zcYnj_docW9TyYSRmR_9sANzobO8RIaxSUVipkCt6he1uwMILzhBtrC26WV0dPXE_Tg"
-}
-```
-```json
-     {
-  "firstName": "jayanta",
-  "lastName": "Panigrahi",
-  "spouseFirstName": "jaya",
-  "spouseLastName": "panigrahi",
-  "consentToShareInformation":"false"
-}
-```
-</details>
-<details>
-    <summary>Response:</summary>
-
-```json
-{
-    "status": {
-        "status_code": 200,
-        "message": "SUCCESS"
-    },
-    "data": {
-        "id": 22,
-        "userId": 2,
-        "firstName": "jayanta",
-        "spouseFirstName": "jaya",
-        "lastName": "Panigrahi",
-        "spouseLastName": "panigrahi",
-        "dateForUser": "2021-01-01T07:00:00.000+00:00",
-        "dateForSpouse": "2021-01-01T07:00:00.000+00:00",
-        "consentToShareInformation": "false",
-        "createdAt": 1598980913509,
-        "updatedAt": 1598983668400
-    }
-}
-```
-</details>
-### User Consent API
-Endpoint: `/api/auth/user-consents`
-
-API endpoint to end user session.
-
-| Code | Description           | Links    |
-|------|-----------------------|----------|
-| 200  | SUCCESS               | No Links |
-| 500  | INTERNAL_SERVER_ERROR | No Links |
-
-<details>
-    <summary>GET Request Header:</summary>
-
-```json
-{
-  "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNTk2Nzk5OTQ3LCJleHAiOjE1OTY4ODYzNDd9.w19Ve8UJez0w9kRGjy7zcYnj_docW9TyYSRmR_9sANzobO8RIaxSUVipkCt6he1uwMILzhBtrC26WV0dPXE_Tg"
-}
-```
-</details>
-<details>
-    <summary>Response:</summary>
-
-```json
-{
-    "status": {
-        "status_code": 200,
-        "message": "SUCCESS"
-    },
-    "data": {
-        "id": 22,
-        "userId": 2,
-        "firstName": "jayanta",
-        "spouseFirstName": "jaya",
-        "lastName": "Panigrahi",
-        "spouseLastName": "panigrahi",
-        "dateForUser": "2021-01-01T07:00:00.000+00:00",
-        "dateForSpouse": "2021-01-01T07:00:00.000+00:00",
-        "consentToShareInformation": "false",
-        "createdAt": 1598980913509,
-        "updatedAt": 1598983668400
-    }
-}
-```
-</details>
-[table of contents](#table-of-contents)
-
-### Commit, Push & Creating Branches
-Jira ticket addressed will be associated to it's own branch. For example lets say you are addressing Jira ticket "DIG-27". You will create a branch with the following format: `<type>/<jiraTicketId>-<description>`. 
-
-Practical example is `task/dig-27-filtering-api-update`.
-
-You should commit with a message that includes the jira ticket. You can also have fun, so feel free to include gitmoji too :slightly_smiling_face:. The format for commit messages with gitmoji will be `<gitmoji> <jira ticket> <message>`. 
-
-Practical example is `:rocket: DIG-27 Created filters for APIs`.
-
-More information on this [Strategy](https://nvie.com/posts/a-successful-git-branching-model/#feature-branches).
-
-<a name="changelog"></a>
-## CHANGELOG
-
-1. 2020-07-30: Add README to repo
-
+After successfull uplaod of build you can see the changes in port number 8080(default port of beanstalk)
 
 
 

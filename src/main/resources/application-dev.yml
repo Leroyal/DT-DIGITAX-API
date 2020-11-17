@@ -1,6 +1,6 @@
 winme:
   string:
-    hello: "DEV"
+    hello: "dev"
   constant:
     env: "DEV"
     host: "http://localhost:8080"

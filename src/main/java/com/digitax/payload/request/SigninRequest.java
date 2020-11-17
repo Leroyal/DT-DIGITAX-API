@@ -21,4 +21,6 @@ public class SigninRequest {
     @NotNull(message = "deviceType required.")
     @Pattern(regexp = "^Android$|^iOS$|^Web$", message = "allowed input: Android, iOS, Web")
     private String deviceType; 
+    
+    private String uniqueId; 
 }
