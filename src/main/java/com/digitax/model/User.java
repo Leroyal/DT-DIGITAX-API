@@ -42,6 +42,9 @@ public class User {
 
     @Size(max = 10)
     private String phone;
+    
+    @Column(name = "biometricDeviceId")
+    private String biometricDeviceId;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",

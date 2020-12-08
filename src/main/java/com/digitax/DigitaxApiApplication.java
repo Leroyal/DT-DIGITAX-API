@@ -3,6 +3,7 @@ package com.digitax;
 
 
 import com.digitax.app.properties.AppProperty;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableConfigurationProperties(AppProperty.class)
 @EnableTransactionManagement
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class DigitaxApiApplication {
     public static void main(String[] args) {
         SpringApplication.run(DigitaxApiApplication.class, args);

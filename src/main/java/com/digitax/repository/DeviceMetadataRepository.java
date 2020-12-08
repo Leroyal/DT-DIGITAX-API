@@ -28,4 +28,6 @@ public interface DeviceMetadataRepository extends JpaRepository<DeviceMetadata, 
 	@Query(value = "delete from device_metadata WHERE unique_id = ?1 and user_name = ?2", nativeQuery = true)
 	void deleteByUniqueIdandUserName(String uniqueId, String userName);
 
+	List<DeviceMetadata> findFirst5ByUserId(long userId);
+
 }
