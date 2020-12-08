@@ -12,6 +12,7 @@ import com.digitax.model.Role;
 import com.digitax.model.User;
 import com.digitax.model.UserProfile;
 import com.digitax.payload.ApiRes;
+import com.digitax.payload.request.BiometricSignInRequest;
 import com.digitax.payload.request.ChangeEmailRequest;
 import com.digitax.payload.request.ChangePasswordRequest;
 import com.digitax.payload.request.ForgotPasswordRequest;
@@ -23,6 +24,7 @@ import com.digitax.payload.request.UpdatePasswordRequest;
 import com.digitax.payload.request.VerifyChangeEmailRequest;
 import com.digitax.payload.request.VerifyChangePassword;
 import com.digitax.payload.request.VerifyOtpRequest;
+import com.digitax.payload.request.VerifySiteRequest;
 import com.digitax.payload.response.JwtResponse;
 import com.digitax.payload.response.SessionResponse;
 import com.digitax.repository.DeviceMetadataRepository;
@@ -36,6 +38,7 @@ import com.digitax.security.services.UserDetailsImpl;
 import com.digitax.service.EmailService;
 import com.digitax.service.SmsService;
 import com.digitax.service.impl.UserProfileServiceImpl;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -54,13 +57,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
@@ -81,6 +88,9 @@ import com.digitax.constants.ResponseConstants;
 @Api(tags = {"AuthController"}, description = "Auth Controller")
 @RequestMapping("/api/auth")
 public class AuthController {
+	
+	private static final String GOOGLE_RECAPTCHA_ENDPOINT = "https://www.google.com/recaptcha/api/siteverify";
+	
     private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
 
     @Value("${digitax.app.jwtExpirationMs}")
@@ -128,7 +138,7 @@ public class AuthController {
      * @param loginRequest
      * @return
      * Used JWT for session checking Please find the file on package security.jwt and jwtutils class for refrence of token creation
-     * Used Spring boot default authentication for veryfing user and authenticatio- manager 
+     * Used Spring boot default authentication for veryfing user and authentication- manager 
      * Used UserProfileServiceImpl service for user model access
      */
     @SuppressWarnings("unchecked")
@@ -171,7 +181,7 @@ public class AuthController {
 	    		else {
 	    			JSONObject statusObj = new JSONObject();
 			        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
-			        statusObj.put("message", "User Does not exists");
+			        statusObj.put("message", "User Does not exist");
 			        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
 			       
 	    		}
@@ -209,6 +219,96 @@ public class AuthController {
            }
     }
     
+    /**#{@link #authenticateUser(SigninRequest, HttpServletRequest, BindingResult)}
+     * 
+     * @param loginRequest
+     * @param request
+     * @param bindingResult
+     * @return
+     */
+    
+    @SuppressWarnings("unchecked")
+    @PostMapping("/biometric-signin")
+    public ResponseEntity<?> biometricAuthentication(@Valid @RequestBody BiometricSignInRequest loginRequest,HttpServletRequest request,BindingResult bindingResult) {
+    	if (bindingResult.hasErrors()) {
+			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+			 JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", errors);
+		        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
+          }
+    	long jwtExpiry;
+	   	  if(loginRequest.getDeviceType().equals("Android") || loginRequest.getDeviceType().equals("iOS")) {
+	         jwtExpiry = jwtExpirationMs*360;
+	         System.out.println(jwtExpiry);
+		   	}
+		   	else
+		   	{
+		   	 jwtExpiry = jwtExpirationMs;
+		   	}
+    	try 
+    	{  if(userRepository.existsByBiometricDeviceId(loginRequest.getBiometricDeviceId()))
+    		{
+	    	User  detailsObj = userRepository.findByBiometricDeviceId(loginRequest.getBiometricDeviceId());
+	    	String jwt = jwtUtils.generateJwtTokenByUser(detailsObj,loginRequest.getDeviceType());
+            Object Sessionobj = new SessionResponse(jwt, jwtExpiry);
+            JSONObject userDetailsObj = new JSONObject();
+            userDetailsObj.put("id", detailsObj.getId());
+            userDetailsObj.put("username", detailsObj.getUsername());
+            userDetailsObj.put("email", detailsObj.getEmail());
+            userDetailsObj.put("authorities", detailsObj.getRoles());
+            userDetailsObj.put("phone", detailsObj.getPhone());
+
+            JwtResponse obj = new JwtResponse(Sessionobj, userDetailsObj);
+            JSONObject statusObj = new JSONObject();
+            statusObj.put("status_code", 200);
+            statusObj.put("message", "SUCCESS");
+             
+            return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
+	    	}
+	    	else
+	    	{
+	    		  if(loginRequest.getEmail() != null)
+	    		  {
+	    			    User  detailsObj = userRepository.findByEmail(loginRequest.getEmail());
+	    			    detailsObj.setBiometricDeviceId(loginRequest.getBiometricDeviceId());
+	    			    userRepository.updateUserBiometricDeviceId(loginRequest.getBiometricDeviceId(),System.currentTimeMillis(),detailsObj.getId());
+	    		    	String jwt = jwtUtils.generateJwtTokenByUser(detailsObj,loginRequest.getDeviceType());
+	    	            Object Sessionobj = new SessionResponse(jwt, jwtExpiry);
+	    	            JSONObject userDetailsObj = new JSONObject();
+	    	            userDetailsObj.put("id", detailsObj.getId());
+	    	            userDetailsObj.put("username", detailsObj.getUsername());
+	    	            userDetailsObj.put("email", detailsObj.getEmail());
+	    	            userDetailsObj.put("authorities", detailsObj.getRoles());
+	    	            userDetailsObj.put("phone", detailsObj.getPhone());
+
+	    	            JwtResponse obj = new JwtResponse(Sessionobj, userDetailsObj);
+	    	            JSONObject statusObj = new JSONObject();
+	    	            statusObj.put("status_code", 200);
+	    	            statusObj.put("message", "SUCCESS");
+	    	            return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
+	    		  }
+	    		  else
+	    		  {
+	    		  JSONObject statusObj = new JSONObject();	   
+			      statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+			      statusObj.put("message", "FAILURE");
+		    	  JSONObject respObj = new JSONObject();
+		    	  respObj.put("status","Email required");
+		    	  respObj.put("email_required",true);
+			      return new ResponseEntity<>(ApiRes.success(respObj, statusObj), HttpStatus.OK);
+	    		  }
+	    	}
+    	
+	     } 
+    	catch (Exception e) {
+	 	   JSONObject statusObj = new JSONObject();
+	        statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+	        statusObj.put("message", "FAILURE");
+	        logger.error("Unauthorized error: {}");
+	        return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);
+	        }
+    }
     
     /**##
      * 
@@ -571,8 +671,51 @@ public class AuthController {
 		    return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
 			 }	      
           }
-    
-    
+    /**#
+     * 
+     * @param request
+     * @param bindingResult
+     * @return
+     */
+
+    @SuppressWarnings("unchecked")
+    @PostMapping("/verify-site")
+    public ResponseEntity<?> verifySite(@Valid @RequestBody VerifySiteRequest request,BindingResult bindingResult) {
+    	if (bindingResult.hasErrors()) {
+			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+			 JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", errors);
+		        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
+          }  
+		    try {
+		    	String captchaResponse = request.getResponse();
+		    	RestTemplate restTemplate = new RestTemplate();
+
+		        MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
+		        requestMap.add("secret", request.getSecret());
+		        requestMap.add("response", captchaResponse);
+
+//		        CaptchaResponse apiResponse = restTemplate.postForObject(GOOGLE_RECAPTCHA_ENDPOINT, requestMap, CaptchaResponse.class);
+//		        if(apiResponse == null){
+//		            return false;
+//		        }
+
+//		        return Boolean.TRUE.equals(apiResponse.getSuccess())	;
+		    	  JSONObject statusObj = new JSONObject();	   
+			      statusObj.put("status_code", ResponseConstants.SUCCESS);
+			      statusObj.put("message", "SUCCESS");
+		    	  JSONObject respObj = new JSONObject();
+		    	  respObj.put("status",true);
+			      return new ResponseEntity<>(ApiRes.success(respObj, statusObj), HttpStatus.OK);
+              }
+			catch (Exception e) {
+			JSONObject statusObj = new JSONObject();
+		    statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+		    statusObj.put("message", "FAILURE");
+		    return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
+			 }	      
+          }
     /**##
      * 
      * @return
@@ -582,7 +725,7 @@ public class AuthController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getUserAccountActivity() {
 		try {
-		List<DeviceMetadata> detailsObj = deviceMetadataRepository.findByUserId(UserSession.getUserId());
+		List<DeviceMetadata> detailsObj = deviceMetadataRepository.findFirst5ByUserId(UserSession.getUserId());
 		JSONObject statusObj = new JSONObject();
         statusObj.put("status_code", ResponseConstants.SUCCESS);
         statusObj.put("message", "SUCCESS");

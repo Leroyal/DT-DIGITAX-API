@@ -39,4 +39,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	@Query(value = "UPDATE users SET password = ?1, updated_at= ?2 WHERE email = ?3", nativeQuery = true)
 	public void updateUserPassword(String encode, long currentTimeMillis, String email);
 
+	User findByBiometricDeviceId(String biometricDeviceId);
+
+	boolean existsByBiometricDeviceId(String biometricDeviceId);
+    
+	@Modifying
+    @Transactional 
+	@Query(value = "UPDATE users SET biometric_device_id = ?1, updated_at= ?2 WHERE id = ?3", nativeQuery = true)
+	public void updateUserBiometricDeviceId(String biometricDeviceId, long currentTimeMillis, Long id);
+
 }
