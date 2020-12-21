@@ -103,6 +103,28 @@ public class SendGridEmailService implements EmailService {
 		
 	}
 
+	@Override
+	public String verifyEmail(String email, String token, String username) {
+		Mail mail = new Mail();
+		Email fromEmail = new Email();
+		fromEmail.setName(MailConstants.emailSubject);
+		fromEmail.setEmail(MailConstants.fromEmial);
+		mail.setFrom(fromEmail);
+		mail.setTemplateId(MailConstants.EMAIL_VERIFICATION_REGISTRATION);
+
+		Personalization personalization = new Personalization();
+		//This is the value that will be passed to the dynamic template in SendGrid
+         personalization.addDynamicTemplateData("username", username);
+         personalization.addDynamicTemplateData("email", email);
+         personalization.addDynamicTemplateData("verifyUrl", MailConstants.baseUrl+"verify-new-email?email_token="+token);
+         personalization.addTo(new Email(email));
+         mail.addPersonalization(personalization);
+        
+         sendMail(mail);
+
+	    return "email was successfully send";
+	}
+
 	
 	  
     	

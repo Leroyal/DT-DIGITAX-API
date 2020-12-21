@@ -5,7 +5,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.swagger.annotations.Api;
 
+
 import com.digitax.model.DeviceMetadata;
+import org.apache.commons.lang3.StringUtils;
 import com.digitax.model.ERole;
 import com.digitax.model.MarketingPreference;
 import com.digitax.model.Role;
@@ -36,6 +38,7 @@ import com.digitax.security.jwt.UserSession;
 import com.digitax.service.DeviceMetadataService;
 import com.digitax.security.services.UserDetailsImpl;
 import com.digitax.service.EmailService;
+import com.digitax.service.RecaptchaService;
 import com.digitax.service.SmsService;
 import com.digitax.service.impl.UserProfileServiceImpl;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -73,8 +76,10 @@ import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -113,6 +118,9 @@ public class AuthController {
     
     @Autowired
     SmsService smsService;
+    
+    @Autowired 
+    RecaptchaService captchaService;
     
     @Autowired
     JwtUtils jwtUtils;
@@ -193,7 +201,17 @@ public class AuthController {
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
+            
             User detailsObjUserAftrLogin = userRepository.findByEmail(userDetails.getEmail());
+            if(detailsObjUserAftrLogin.getIsVerifiedEmail() != 1)
+            {
+            	JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", "Your email is not verified");
+		        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
+            }
+            else
+            {
             Object Sessionobj = new SessionResponse(jwt, jwtExpiry);
             JSONObject userDetailsObj = new JSONObject();
             userDetailsObj.put("id", userDetails.getId());
@@ -210,6 +228,7 @@ public class AuthController {
             devideMetadataService.saveUserActivity(request,UserSession.getUserId(), detailsObjUserAftrLogin,loginRequest.getUniqueId());
 	        
             return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
+            }
        } catch (Exception e) {
     	   JSONObject statusObj = new JSONObject();
            statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
@@ -343,6 +362,15 @@ public class AuthController {
 	    	if(isValid)
 	    	{
 	    	User  detailsObj = userRepository.findByPhone(loginRequest.getPhone());
+	    	if(detailsObj.getIsVerifiedEmail() != 1)
+            {
+            	JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", "Your email is not verified");
+		        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
+            }
+            else
+            {
 	    	String jwt = jwtUtils.generateJwtTokenByUser(detailsObj,loginRequest.getDeviceType());
             Object Sessionobj = new SessionResponse(jwt, jwtExpiry);
             JSONObject userDetailsObj = new JSONObject();
@@ -360,6 +388,7 @@ public class AuthController {
             devideMetadataService.saveUserActivity(request,detailsObj.getId(), detailsObj, loginRequest.getUniqueId());
 	        
             return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
+            }
 	    	}
 	    	else
 	    	{
@@ -472,6 +501,16 @@ public class AuthController {
         user.setRoles(roles);
        
         userRepository.save(user);
+        
+        String token = Jwts.builder()
+        		.setSubject("Forgot password")
+        		.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+        		.claim("UserId",user.getId())
+        		.claim("UserName",user.getUsername())
+        		.signWith(SignatureAlgorithm.HS512, jwtSecret )
+        		.compact();
+	        String emailData = emailService.verifyEmail(user.getEmail(),token,user.getUsername());
+			System.out.println(emailData);
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(signUpRequest.getUsername(), signUpRequest.getPassword()));
@@ -680,7 +719,7 @@ public class AuthController {
 
     @SuppressWarnings("unchecked")
     @PostMapping("/verify-site")
-    public ResponseEntity<?> verifySite(@Valid @RequestBody VerifySiteRequest request,BindingResult bindingResult) {
+    public ResponseEntity<?> verifySite(@Valid @RequestBody VerifySiteRequest request,BindingResult bindingResult,HttpServletRequest httprequest) {
     	if (bindingResult.hasErrors()) {
 			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
 			 JSONObject statusObj = new JSONObject();
@@ -689,25 +728,28 @@ public class AuthController {
 		        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
           }  
 		    try {
+		    	String ip = httprequest.getRemoteAddr();
 		    	String captchaResponse = request.getResponse();
-		    	RestTemplate restTemplate = new RestTemplate();
+		    	String captchaVerifyMessage = 
+		                captchaService.verifyRecaptcha(ip, captchaResponse,request.getSecret());
 
-		        MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-		        requestMap.add("secret", request.getSecret());
-		        requestMap.add("response", captchaResponse);
-
-//		        CaptchaResponse apiResponse = restTemplate.postForObject(GOOGLE_RECAPTCHA_ENDPOINT, requestMap, CaptchaResponse.class);
-//		        if(apiResponse == null){
-//		            return false;
-//		        }
-
-//		        return Boolean.TRUE.equals(apiResponse.getSuccess())	;
+		    	if ( StringUtils.isNotEmpty(captchaVerifyMessage)) {
+		            Map<String, Object> response = new HashMap<>();
+		            System.out.println("captchaVerifyMessage"+captchaVerifyMessage);
+		            JSONObject statusObj = new JSONObject();
+				    statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+				    statusObj.put("message", "FAILURE");
+				    return new ResponseEntity<>(ApiRes.success(captchaVerifyMessage, statusObj), HttpStatus.OK);	
+		            
+		           }
+		    	else {
 		    	  JSONObject statusObj = new JSONObject();	   
 			      statusObj.put("status_code", ResponseConstants.SUCCESS);
 			      statusObj.put("message", "SUCCESS");
 		    	  JSONObject respObj = new JSONObject();
 		    	  respObj.put("status",true);
 			      return new ResponseEntity<>(ApiRes.success(respObj, statusObj), HttpStatus.OK);
+		    	}
               }
 			catch (Exception e) {
 			JSONObject statusObj = new JSONObject();
@@ -988,6 +1030,50 @@ public class AuthController {
        		Optional<User> detailsObj = userRepository.findByUsername(claims.get("UserName").toString());
        		User userDetails  = detailsObj.get();
        		userDetails.setPassword(encoder.encode(forgotPassword.getNewPassword()));
+       		userRepository.save(userDetails);
+       		JSONObject statusObj = new JSONObject();	      	
+	        statusObj.put("status_code", ResponseConstants.SUCCESS);
+	        statusObj.put("message", "SUCCESS");
+	        return new ResponseEntity<>(ApiRes.success(null, statusObj), HttpStatus.OK);
+	    	}
+	    	else
+	    	{
+	    		JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", "Token is not valid");
+		        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
+	    	}
+	  
+			}
+			catch (Exception e) {
+			JSONObject statusObj = new JSONObject();
+	        statusObj.put("status_code",ResponseConstants.INTERNAL_SERVER_ERROR);
+	        statusObj.put("message", "FAILURE");
+	        return new ResponseEntity<>(ApiRes.success(e.getMessage(), statusObj), HttpStatus.OK);	
+	    }
+     }
+    
+    @SuppressWarnings("unchecked")
+    @PostMapping("/new-email-verify")
+    public ResponseEntity<?> verifyNewEmail(@Valid @RequestBody VerifyChangeEmailRequest EmailRequest,BindingResult bindingResult) {
+    	if (bindingResult.hasErrors()) {
+			ArrayList<?> errors = (ArrayList<?>) bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+			 JSONObject statusObj = new JSONObject();
+		        statusObj.put("status_code", ResponseConstants.VALIDATION_ERROR);
+		        statusObj.put("message", errors);
+		        return ResponseEntity.status(HttpStatus.OK).body(ApiRes.success(null,statusObj));
+          } 
+    	try {
+    		boolean isVaid = jwtUtils.validateJwtToken(EmailRequest.getVerifyToken());
+    		
+    	if (isVaid) {
+       		Claims claims = Jwts.parser()
+            .setSigningKey(jwtSecret)
+            .parseClaimsJws(EmailRequest.getVerifyToken())
+            .getBody();
+       		Optional<User> detailsObj = userRepository.findByUsername(claims.get("UserName").toString());
+       		User userDetails  = detailsObj.get();
+       		userDetails.setIsVerifiedEmail(1);
        		userRepository.save(userDetails);
        		JSONObject statusObj = new JSONObject();	      	
 	        statusObj.put("status_code", ResponseConstants.SUCCESS);

@@ -6,4 +6,6 @@ public interface EmailService {
 	String changePasswordSupport(String email, String UserName);
 
 	String forgotPasswordSupport(String email, String token, String username);
+
+	String verifyEmail(String email, String token, String username);
 }

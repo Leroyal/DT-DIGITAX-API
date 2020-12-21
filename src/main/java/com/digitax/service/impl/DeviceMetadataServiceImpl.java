@@ -80,7 +80,7 @@ public class DeviceMetadataServiceImpl implements DeviceMetadataService {
         }
         else
         {
-        	deviceDetailsObj.setUserId(UserSession.getUserId());
+        	deviceDetailsObj.setUserId(user.getId());
         	deviceDetailsObj.setCreatedAt(System.currentTimeMillis());
         	deviceMetadataRepository.save(deviceDetailsObj);
         }
