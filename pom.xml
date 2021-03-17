@@ -71,6 +71,46 @@
             <artifactId>json-simple</artifactId>
             <version>1.1</version>
         </dependency>
+       
+	<dependency>
+		<groupId>org.projectlombok</groupId>
+		<artifactId>lombok</artifactId>
+		<version>1.18.16</version>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
+    <groupId>javax.validation</groupId>
+    <artifactId>validation-api</artifactId>
+    <version>2.0.1.Final</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web-services</artifactId>
+</dependency>
+<dependency>
+    <groupId>wsdl4j</groupId>
+    <artifactId>wsdl4j</artifactId>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/jaxb2-maven-plugin -->
+<dependency>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>jaxb2-maven-plugin</artifactId>
+    <version>2.3.1</version>
+</dependency>
+<dependency>
+      <groupId>com.onelogin</groupId>
+      <artifactId>java-saml</artifactId>
+      <version>2.6.0</version>
+  </dependency>
+  <!-- https://mvnrepository.com/artifact/com.sun.xml.ws/jaxws-ri -->
+<dependency>
+    <groupId>com.sun.xml.ws</groupId>
+    <artifactId>jaxws-ri</artifactId>
+    <version>2.3.1</version>
+    <type>pom</type>
+</dependency>
+  
+
     </dependencies>
 
     <build>
@@ -79,6 +119,27 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>jaxb2-maven-plugin</artifactId>
+    <version>1.5</version>
+    <executions>
+        <execution>
+            <id>xjc</id>
+            <goals>
+                <goal>xjc</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+     
+        <schemaDirectory>src/main/resources/</schemaDirectory>
+        <schemaFiles>MeFMSIServices.xsd</schemaFiles>
+        <schemaFiles>MeFHeaderType.xsd</schemaFiles>
+        <outputDirectory>src/main/java</outputDirectory>
+        <clearOutputDir>false</clearOutputDir>
+    </configuration>
+</plugin>
         </plugins>
     </build>
 

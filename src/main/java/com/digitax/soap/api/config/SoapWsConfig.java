@@ -1,6 +1,6 @@
 package com.digitax.soap.api.config;
 
-import javax.xml.parsers.DocumentBuilderFactory;
+
 
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -28,26 +28,23 @@ public class SoapWsConfig extends WsConfigurerAdapter  {
 		return new  ServletRegistrationBean<MessageDispatcherServlet>(servlet,"/ws/*");        
 	}
 	@Bean(name="Service")
-	public DefaultWsdl11Definition defaultWsdl11Defination(XsdSchema schema)
+	public DefaultWsdl11Definition defaultWsdl11Defination(XsdSchema Schema)
 	{
 		DefaultWsdl11Definition defaultWsdl11Definition=new DefaultWsdl11Definition();
 		defaultWsdl11Definition.setPortTypeName("Service");
 		defaultWsdl11Definition.setLocationUri("/ws");
 		defaultWsdl11Definition.setTargetNamespace("http://www.irs.gov/a2a/mef/MeFMSIServices");
-		defaultWsdl11Definition.setSchema(schema);
+		defaultWsdl11Definition.setSchema(Schema);
 //		defaultWsdl11Definition.setSchema(schema1);
 		return defaultWsdl11Definition;
 	}
 	@Bean
-	public XsdSchema schema()
-	{
-		return new SimpleXsdSchema(new ClassPathResource("MeFMSIServices.xsd"));
+	public XsdSchema serviceSchema() {
+	    return new SimpleXsdSchema(new ClassPathResource("MeFMSIServices.xsd"));
 	}
 
-	@Bean
-	public XsdSchema schema1()
-	{
-		return new SimpleXsdSchema(new ClassPathResource("MeFHeader.xsd"));
-	}
-
+	/*
+	 * @Bean public XsdSchema SoapEnvelopeSchema() { return new SimpleXsdSchema(new
+	 * ClassPathResource("SoapEnvelope.xsd")); }
+	 */
 }
