@@ -101,6 +101,7 @@ public class AuthController {
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             JSONObject statusObj = new JSONObject();
+            System.out.println(statusObj.toJSONString());
             statusObj.put("status_code", ResponseConstants.USER_ALREADY_EXISTS);
             statusObj.put("message", "Username is already taken!");
             return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
@@ -134,7 +135,6 @@ public class AuthController {
         
         Set<String> strRoles = signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
-
         if (strRoles == null) {
             Role userRole = roleRepository.findByName(ERole.ROLE_USER)
                     .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
