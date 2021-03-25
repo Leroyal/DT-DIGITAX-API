@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.9.6
+Created-By: 8.0.5.27 - pwa6480sr5fp27-20190104_01(SR5 FP27) (IBM Corpo
+ ration)
+

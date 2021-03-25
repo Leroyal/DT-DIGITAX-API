@@ -52,6 +52,11 @@ xmlns:tns="http://www.irs.gov/a2a/mef/TaxSubmission"
             <xsd:element name="StateType" type="xsd:string" />
         </xsd:sequence>
     </xsd:complexType>
+    <xsd:simpleType name="CurrencyType">
+        
+            <xsd:restriction  base="xsd:string"  />
+                  
+    </xsd:simpleType>
 <xsd:element name="getTaxSubmissionRequest">
         <xsd:complexType>
             <xsd:sequence>
@@ -71,7 +76,8 @@ xmlns:tns="http://www.irs.gov/a2a/mef/TaxSubmission"
                 </xsd:choice>
                 <xsd:element name="PersonFirstName" type="tns:PersonFullNameType" />
                  <xsd:element name="PersonLastName" type="tns:PersonFullNameType" />
-                                
+                   <xsd:element name="Date-of-birth" type="xsd:date" />  
+                      <xsd:element name="Currency" type="tns:CurrencyType" />             
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
