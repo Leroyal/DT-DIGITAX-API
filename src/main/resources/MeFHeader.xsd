@@ -1,0 +1,129 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mefhdr="http://www.irs.gov/a2a/mef/MeFHeader" targetNamespace="http://www.irs.gov/a2a/mef/MeFHeader" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+<xs:element name="MeFHeader" type="mefhdr:MeFHeaderType"/>
+<xs:element name="TransmitterIPAddress" type="mefhdr:TransmitterIPAddressType"/>
+<xs:element name="ErrorExceptionDetail" type="mefhdr:ErrorExceptionDetailType"/>
+<xs:complexType name="MeFHeaderType">
+<xs:sequence>
+<xs:element name="MessageID" type="mefhdr:HeaderMessageIdType">
+<xs:annotation>
+<xs:documentation> This Message ID </xs:documentation>
+</xs:annotation>
+</xs:element>
+<xs:element name="RelatesTo" type="mefhdr:HeaderMessageIdType" minOccurs="0">
+<xs:annotation>
+<xs:documentation> For response messages the request Message ID it relates to </xs:documentation>
+</xs:annotation>
+</xs:element>
+<xs:element name="Action" type="xs:string">
+<xs:annotation>
+<xs:documentation> The service operation to invoke. </xs:documentation>
+</xs:annotation>
+</xs:element>
+<xs:element name="MessageTs" type="xs:dateTime">
+<xs:annotation>
+<xs:documentation>The date and time this message was created.</xs:documentation>
+</xs:annotation>
+</xs:element>
+<xs:element name="ETIN" type="xs:string" minOccurs="0">
+<xs:annotation>
+<xs:documentation> The ETIN of the party associated with this message </xs:documentation>
+</xs:annotation>
+</xs:element>
+<xs:element name="SessionKeyCd" type="mefhdr:SessionKeyCdType" minOccurs="0">
+<xs:annotation>
+<xs:documentation> This indicates whether a session key is returned (Y or N) </xs:documentation>
+</xs:annotation>
+</xs:element>
+<xs:element name="TestCd" type="mefhdr:TestCdType" minOccurs="0">
+<xs:annotation>
+<xs:documentation> This indicates whether the service request is for the test(T) or production(P) environment </xs:documentation>
+</xs:annotation>
+</xs:element>
+<xs:element name="NotificationResponse" type="mefhdr:MeFNotificationResponse" minOccurs="0">
+<xs:annotation>
+<xs:documentation> This indicates the notification type and date/time </xs:documentation>
+</xs:annotation>
+</xs:element>
+<xs:element name="AppSysID" type="xs:string">
+<xs:annotation>
+<xs:documentation> The Application System ID (User ID) of the A2A client calling this web service. It is mandatory for Strong Authentication users. </xs:documentation>
+</xs:annotation>
+</xs:element>
+<xs:element name="WSDLVersionNum" type="xs:string" fixed="10.4">
+<xs:annotation>
+<xs:documentation> The fixed WSDL version number. </xs:documentation>
+</xs:annotation>
+</xs:element>
+<xs:element name="ClientSoftwareTxt" type="xs:string" minOccurs="0">
+<xs:annotation>
+<xs:documentation> For the MeF A2A Toolkit comment. </xs:documentation>
+</xs:annotation>
+</xs:element>
+</xs:sequence>
+<xs:attribute name="Id" type="xs:ID" use="optional"/>
+<xs:anyAttribute processContents="skip"/>
+</xs:complexType>
+<xs:complexType name="MeFNotificationResponse">
+<xs:sequence>
+<xs:element name="NotificationDesc" type="xs:string">
+<xs:annotation>
+<xs:documentation> The item to which this notification applies (e.g. Password Expires in 6 days) </xs:documentation>
+</xs:annotation>
+</xs:element>
+<xs:element name="NotificationDt" type="xs:dateTime">
+<xs:annotation>
+<xs:documentation> The current system date and time of this notification. </xs:documentation>
+</xs:annotation>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:simpleType name="TestCdType">
+<xs:restriction base="xs:string">
+<xs:enumeration value="T"/>
+<xs:enumeration value="P"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="SessionKeyCdType">
+<xs:restriction base="xs:string">
+<xs:enumeration value="Y"/>
+<xs:enumeration value="N"/>
+</xs:restriction>
+</xs:simpleType>
+<!--  Header Message ID Type - 20 - 21 digits (ETIN + ccyyddd + 8-character alphanumeric)  -->
+<xs:simpleType name="HeaderMessageIdType">
+<xs:restriction base="xs:string">
+<xs:pattern value="[0-9]{12}[a-z0-9]{8}[E|R|D]?"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="ErrorClassificationCdType">
+<xs:restriction base="xs:string">
+<xs:enumeration value="SYSTEM_ERROR"/>
+<xs:enumeration value="RESOURCE_UNAVAILABLE"/>
+<xs:enumeration value="MESSAGE_FORMAT_ERROR"/>
+<xs:enumeration value="SECURITY_ERROR"/>
+<xs:enumeration value="REQUEST_ERROR"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:complexType name="ErrorExceptionDetailType">
+<xs:sequence>
+<xs:element name="ErrorMessageTxt" type="xs:string"/>
+<xs:element name="ErrorClassificationCd" type="mefhdr:ErrorClassificationCdType"/>
+<xs:element name="ErrorMessageCd" type="xs:string" minOccurs="0"/>
+<xs:element name="HostNm" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="TransmitterIPAddressType">
+<xs:sequence>
+<xs:element name="TransmitterIPAddressTxt" type="xs:string">
+<xs:annotation>
+<xs:documentation> The client IP address. Sent to the MeF backend. </xs:documentation>
+</xs:annotation>
+</xs:element>
+<xs:element name="ReceivedAtIRSTs" type="xs:dateTime">
+<xs:annotation>
+<xs:documentation> The time the message is received in the portal. Sent to the MeF backend.</xs:documentation>
+</xs:annotation>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>

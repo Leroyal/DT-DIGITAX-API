@@ -1,0 +1,88 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mef="http://www.irs.gov/a2a/mef/MeFMSIServices" targetNamespace="http://www.irs.gov/a2a/mef/MeFMSIServices" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+<xs:element name="LoginRequest" type="mef:LoginRequestType"/>
+<xs:element name="LoginResponse" type="mef:LoginResponseType"/>
+<xs:element name="LogoutRequest" type="mef:LogoutRequestType"/>
+<xs:element name="LogoutResponse" type="mef:LogoutResponseType"/>
+<xs:element name="ETINRetrievalRequest" type="mef:ETINRetrievalRequestType"/>
+<xs:element name="ETINRetrievalResponse" type="mef:ETINRetrievalResponseType"/>
+<xs:element name="ETINStatusRequest" type="mef:ETINStatusRequestType"/>
+<xs:element name="ETINStatusResponse" type="mef:ETINStatusResponseType"/>
+<xs:element name="GetStateParticipantsListRequest" type="mef:GetStateParticipantsListRequestType"/>
+<xs:element name="GetStateParticipantsListResponse" type="mef:GetStateParticipantsListResponseType"/>
+<xs:complexType name="LoginRequestType">
+
+</xs:complexType>
+<xs:complexType name="LoginResponseType">
+<xs:sequence>
+<xs:element name="StatusTxt" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="LogoutRequestType">
+<xs:sequence/>
+</xs:complexType>
+<xs:complexType name="LogoutResponseType">
+<xs:sequence>
+<xs:element name="StatusTxt" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:simpleType name="TestCdType">
+<xs:restriction base="xs:string">
+<xs:enumeration value="T"/>
+<xs:enumeration value="P"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:complexType name="ETINRetrievalRequestType">
+<xs:sequence>
+<xs:element name="TestCd" type="mef:TestCdType"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="ETINRetrievalResponseType">
+<xs:sequence>
+<xs:element name="Cnt" type="xs:int" default="0"/>
+<xs:element name="ETINStatusGrp" type="mef:ETINStatusGrpType" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="ETINStatusRequestType">
+<xs:sequence>
+<xs:element name="ETIN" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="ETINStatusResponseType">
+<xs:sequence>
+<xs:element name="ETIN" type="xs:string"/>
+<xs:element name="StatusTxt" type="xs:string"/>
+<xs:element name="FormStatusGrp" type="mef:FormStatusGrpType" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="GetStateParticipantsListRequestType">
+<xs:sequence/>
+</xs:complexType>
+<xs:complexType name="GetStateParticipantsListResponseType">
+<xs:sequence>
+<xs:element name="Cnt" type="xs:int" default="0"/>
+<xs:element name="StateParticipantGrp" type="mef:StateParticipantGrpType" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="FormStatusGrpType">
+<xs:sequence>
+<xs:element name="FormNum" type="xs:string"/>
+<xs:element name="FormStatusTxt" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="ETINStatusGrpType">
+<xs:sequence>
+<xs:sequence>
+<xs:element name="ETIN" type="xs:string"/>
+<xs:element name="StatusTxt" type="xs:string"/>
+<xs:element name="FormStatusGrp" type="mef:FormStatusGrpType" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="StateParticipantGrpType">
+<xs:sequence>
+<xs:element name="StateCd" type="xs:string"/>
+<xs:element name="ParticipantProgramsTxt" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+
+</xs:schema>
