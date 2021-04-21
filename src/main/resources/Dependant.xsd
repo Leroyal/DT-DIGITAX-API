@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.irs.gov/a2a/mef/Student" targetNamespace="http://www.irs.gov/a2a/mef/Student" elementFormDefault="qualified" attributeFormDefault="unqualified">
+ <xsd:complexType name="SSNType">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="1" name="ssn" type="xsd:string" />
+        </xsd:sequence>
+           </xsd:complexType>
+           <xsd:simpleType name="StateType">
+   <xsd:restriction  base="xsd:string">
+    <xsd:enumeration value="AL"/>
+     <xsd:enumeration value="AK"/>
+     <xsd:enumeration value="AS"/>
+     <xsd:enumeration value="AZ"/>
+     <xsd:enumeration value="AR"/>
+     <xsd:enumeration value="CA"/>
+     <xsd:enumeration value="CO"/>
+     <xsd:enumeration value="MP"/>
+     <xsd:enumeration value="CT"/>
+     <xsd:enumeration value="DE"/>
+     <xsd:enumeration value="DC"/>
+     <xsd:enumeration value="FM"/>
+     <xsd:enumeration value="FL"/>
+     <xsd:enumeration value="GA"/>
+     <xsd:enumeration value="GU"/>
+     <xsd:enumeration value="HI"/>
+     <xsd:enumeration value="ID"/>
+     <xsd:enumeration value="IL"/>
+     <xsd:enumeration value="IN"/>
+     <xsd:enumeration value="IA"/>
+     <xsd:enumeration value="KS"/>
+     <xsd:enumeration value="KY"/>
+     <xsd:enumeration value="LA"/>
+     <xsd:enumeration value="ME"/>
+     <xsd:enumeration value="MH"/>
+     <xsd:enumeration value="MD"/>
+     <xsd:enumeration value="MA"/>
+     <xsd:enumeration value="MI"/>
+     <xsd:enumeration value="MN"/>
+     <xsd:enumeration value="MS"/>
+     <xsd:enumeration value="MO"/>
+     <xsd:enumeration value="MT"/>
+     <xsd:enumeration value="NE"/>
+     <xsd:enumeration value="NV"/>
+     <xsd:enumeration value="NH"/>
+     <xsd:enumeration value="NJ"/>
+     <xsd:enumeration value="NM"/>
+     <xsd:enumeration value="NY"/>
+     <xsd:enumeration value="NC"/>
+     <xsd:enumeration value="ND"/>
+     <xsd:enumeration value="OH"/>
+     <xsd:enumeration value="OK"/>
+     <xsd:enumeration value="OR"/>
+     <xsd:enumeration value="PW"/>
+     <xsd:enumeration value="PA"/>
+     <xsd:enumeration value="PR"/>
+     <xsd:enumeration value="RI"/>
+     <xsd:enumeration value="SC"/>
+     <xsd:enumeration value="SD"/>
+     <xsd:enumeration value="TN"/>
+     <xsd:enumeration value="TX"/>
+     <xsd:enumeration value="VI"/>
+     <xsd:enumeration value="UT"/>
+     <xsd:enumeration value="VT"/>
+     <xsd:enumeration value="VA"/>
+     <xsd:enumeration value="WA"/>
+     <xsd:enumeration value="WV"/>
+     <xsd:enumeration value="WI"/>
+     <xsd:enumeration value="WY"/>
+     <xsd:enumeration value="AA"/>
+     <xsd:enumeration value="AE"/>
+     <xsd:enumeration value="AP"/>
+   </xsd:restriction>
+ </xsd:simpleType>
+<xsd:element name="getSpouseTaxSubmissionRequest">
+     <xsd:complexType>
+            <xsd:sequence>
+           
+            <xsd:element name="SpouseFirstName" type="xsd:string" />
+                 <xsd:element name="SpouseLastName" type="xsd:string" />
+                 <xsd:element name="SpouseSocialSecurityNumber" type="tns:SSNType"/>
+                  <xsd:element name="SpouseOccupation" type="xsd:string"/>
+                   <xsd:element name="Date-of-birth" type="xsd:date" />
+                     <xsd:element name="SpouseState" type="tns:StateType" /> 
+                             
+                <xsd:element name="FirstTaxFillingYear" type="xsd:date"/>
+                <xsd:element name="Dependant" type="xsd:int"/>
+                 <xsd:element name="DependantfirstName" type="xsd:string"/>
+                 <xsd:element name="DependantLastName" type="xsd:string"/>
+                   <xsd:element name="citizenship" type="xsd:string"/>
+                         <xsd:element name="dependantDateofBirth" type="xsd:string"/>
+                         <xsd:element name="Gender" type="xsd:string"/>
+                        
+                        <xsd:choice minOccurs="0">
+                 <xsd:element name="disability" type="xsd:string" minOccurs="0"/>
+                 <xsd:element name="passedaway" type="xsd:string" minOccurs="0"/>
+                 <xsd:element name="notdependant" type="xsd:string" minOccurs="0" />
+                                                 
+                </xsd:choice>
+                <xsd:choice minOccurs="0">
+                 <xsd:element name="adopted" type="xsd:string" minOccurs="0"/>
+                 <xsd:element name="foster" type="xsd:string" minOccurs="0"/>
+                 
+                                                 
+                </xsd:choice>
+                  <xsd:element name="durationInYear" type="xsd:string" />
+       </xsd:sequence>
+       </xsd:complexType>   
+    </xsd:element>
+<xsd:element name="getSpouseTaxSubmissionResponse">
+        <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="StatusTxt" type="xsd:string" /> 
+                                
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+
+</xsd:schema>

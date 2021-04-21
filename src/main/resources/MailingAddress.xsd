@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.irs.gov/a2a/mef/Student" targetNamespace="http://www.irs.gov/a2a/mef/Student" elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+<xsd:simpleType name="StateType">
+   <xsd:restriction  base="xsd:string">
+    <xsd:enumeration value="AL"/>
+     <xsd:enumeration value="AK"/>
+     <xsd:enumeration value="AS"/>
+     <xsd:enumeration value="AZ"/>
+     <xsd:enumeration value="AR"/>
+     <xsd:enumeration value="CA"/>
+     <xsd:enumeration value="CO"/>
+     <xsd:enumeration value="MP"/>
+     <xsd:enumeration value="CT"/>
+     <xsd:enumeration value="DE"/>
+     <xsd:enumeration value="DC"/>
+     <xsd:enumeration value="FM"/>
+     <xsd:enumeration value="FL"/>
+     <xsd:enumeration value="GA"/>
+     <xsd:enumeration value="GU"/>
+     <xsd:enumeration value="HI"/>
+     <xsd:enumeration value="ID"/>
+     <xsd:enumeration value="IL"/>
+     <xsd:enumeration value="IN"/>
+     <xsd:enumeration value="IA"/>
+     <xsd:enumeration value="KS"/>
+     <xsd:enumeration value="KY"/>
+     <xsd:enumeration value="LA"/>
+     <xsd:enumeration value="ME"/>
+     <xsd:enumeration value="MH"/>
+     <xsd:enumeration value="MD"/>
+     <xsd:enumeration value="MA"/>
+     <xsd:enumeration value="MI"/>
+     <xsd:enumeration value="MN"/>
+     <xsd:enumeration value="MS"/>
+     <xsd:enumeration value="MO"/>
+     <xsd:enumeration value="MT"/>
+     <xsd:enumeration value="NE"/>
+     <xsd:enumeration value="NV"/>
+     <xsd:enumeration value="NH"/>
+     <xsd:enumeration value="NJ"/>
+     <xsd:enumeration value="NM"/>
+     <xsd:enumeration value="NY"/>
+     <xsd:enumeration value="NC"/>
+     <xsd:enumeration value="ND"/>
+     <xsd:enumeration value="OH"/>
+     <xsd:enumeration value="OK"/>
+     <xsd:enumeration value="OR"/>
+     <xsd:enumeration value="PW"/>
+     <xsd:enumeration value="PA"/>
+     <xsd:enumeration value="PR"/>
+     <xsd:enumeration value="RI"/>
+     <xsd:enumeration value="SC"/>
+     <xsd:enumeration value="SD"/>
+     <xsd:enumeration value="TN"/>
+     <xsd:enumeration value="TX"/>
+     <xsd:enumeration value="VI"/>
+     <xsd:enumeration value="UT"/>
+     <xsd:enumeration value="VT"/>
+     <xsd:enumeration value="VA"/>
+     <xsd:enumeration value="WA"/>
+     <xsd:enumeration value="WV"/>
+     <xsd:enumeration value="WI"/>
+     <xsd:enumeration value="WY"/>
+     <xsd:enumeration value="AA"/>
+     <xsd:enumeration value="AE"/>
+     <xsd:enumeration value="AP"/>
+   </xsd:restriction>
+ </xsd:simpleType>
+
+ <xsd:complexType name="ForeignAddressType">
+        <xsd:sequence>
+            <xsd:element name="ForeignAddressType" type="xsd:string" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+<xsd:element name="getMailingAddressRequest">
+     <xsd:complexType>
+            <xsd:sequence>
+           
+            <xsd:element name="TypeofMailingadress" type="xsd:string" />
+            <xsd:choice minOccurs="0">
+                 <xsd:element name="USAddress" type="xsd:string" />
+                 <xsd:element name="Military" type="xsd:string" />
+                    <xsd:element name="ForeignAddress" type="tns:ForeignAddressType" minOccurs="0" />
+                 <xsd:element name="U.S.Posssession" type="xsd:string" minOccurs="0" />
+                 
+                </xsd:choice>
+                 <xsd:element name="Address" type="xsd:string" />
+                 <xsd:element name="City" type="xsd:string"/>
+                  <xsd:element name="state" type="tns:StateType"/>
+                   <xsd:element name="ZipCode" type="xsd:string" />
+                     <xsd:element name="phoneNo" type="xsd:int" /> 
+                 <xsd:element name="makeMoneyotherthanUS" type="xsd:boolean" />           
+               
+       </xsd:sequence>
+       </xsd:complexType>   
+    </xsd:element>
+<xsd:element name="getMailingAddressResponse">
+        <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="StatusTxt" type="xsd:string" /> 
+                                
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+</xsd:schema>

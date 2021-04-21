@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.irs.gov/a2a/mef/TaxSubmission" targetNamespace="http://www.irs.gov/a2a/mef/TaxSubmission" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xsd:complexType name="EINType">
+<xsd:sequence>
+<xsd:element minOccurs="0" maxOccurs="1" name="EIN" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="SSNType">
+<xsd:sequence>
+<xsd:element minOccurs="0" maxOccurs="1" name="ssn" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="USAddressType">
+<xsd:sequence>
+<xsd:element minOccurs="0" maxOccurs="1" name="USAddressType" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="PersonFullNameType">
+<xsd:sequence>
+<xsd:element name="PersonFullNameType" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="ForeignAddressType">
+<xsd:sequence>
+<xsd:element name="ForeignAddressType" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="StreetAddressType">
+<xsd:sequence>
+<xsd:element name="StreetAddressType" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="CityNameType">
+<xsd:sequence>
+<xsd:element name="CityNameType" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="ZIPCodeType">
+<xsd:sequence>
+<xsd:element name="ZIPCodeType" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="StateType">
+<xsd:sequence>
+<xsd:element name="StateType" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:simpleType name="CurrencyType">
+<xsd:restriction base="xsd:string"/>
+</xsd:simpleType>
+<xsd:element name="getTaxSubmissionRequest">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="EmployeeIdentificationNumber" type="tns:EINType" minOccurs="1"/>
+<xsd:element name="SocialSecurityNumber" type="tns:SSNType"/>
+<xsd:choice minOccurs="0">
+<xsd:element name="USAddress" type="tns:USAddressType"/>
+<xsd:element name="AddressLine1txt" type="tns:StreetAddressType"/>
+<xsd:element name="AddressLine2txt" type="tns:StreetAddressType" minOccurs="0"/>
+<xsd:element name="citynm" type="tns:CityNameType" minOccurs="0"/>
+<xsd:element name="StateAbbreviationCd" type="tns:StateType" minOccurs="0"/>
+<xsd:element name="ZIPcd" type="tns:ZIPCodeType" minOccurs="0"/>
+<xsd:element name="ForeignAddress" type="tns:ForeignAddressType" minOccurs="0"/>
+</xsd:choice>
+<xsd:element name="PersonFirstName" type="tns:PersonFullNameType"/>
+<xsd:element name="PersonLastName" type="tns:PersonFullNameType"/>
+<xsd:element name="Date-of-birth" type="xsd:date"/>
+<xsd:element name="Currency" type="tns:CurrencyType"/>
+<xsd:choice minOccurs="0">
+<xsd:element name="single" type="xsd:string" minOccurs="0"/>
+<xsd:element name="divorced" type="xsd:string" minOccurs="0"/>
+<xsd:element name="married" type="xsd:string" minOccurs="0"/>
+<xsd:element name="inRegisterddomesticpatnership" type="xsd:string" minOccurs="0"/>
+<xsd:element name="legallyseparated" type="xsd:string" minOccurs="0"/>
+<xsd:element name="widowed" type="xsd:string" minOccurs="0"/>
+</xsd:choice>
+</xsd:sequence>
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="getTaxSubmissionResponse">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="StatusTxt" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+</xsd:element>
+</xsd:schema>
