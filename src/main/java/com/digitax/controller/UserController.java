@@ -1,10 +1,10 @@
 package com.digitax.controller;
 
-import com.digitax.constants.Constants;
-import com.digitax.constants.HttpStatusCode;
+
 import com.digitax.payload.ApiRes;
 import com.digitax.security.jwt.JwtUtils;
 import com.digitax.security.jwt.UserSession;
+import com.digitax.constants.ResponseConstants;
 import com.digitax.model.User;
 import com.digitax.model.UserProfile;
 import com.digitax.payload.response.UserDetailsResponse;
@@ -35,44 +35,48 @@ import java.util.Optional;
 @RequestMapping("/api/auth")
 public class UserController {
 
+
     @Autowired
     JwtUtils jwtUtils;
+    
 
     @Autowired
     UserProfileRepository userProfileRepository;
-
+    
+    
     @Autowired
     UserProfileService userProfileService;
     
     @Autowired
     UserDetailsService userDetailsService;
-
+    
+    
     @Autowired
     UserRepository userRepository;
+  
+
 
     @GetMapping("/all")
     public String allAccess() {
         return "Public Content.";
     }
 
+
+  
     @SuppressWarnings("unchecked")
 	@GetMapping("/user-details")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<?> userProfileDetails() {
-    	Optional<UserProfile> userDetails = userProfileRepository.findByUserId(UserSession.getUserId());
+    	Optional<UserProfile> detailsObj = userProfileRepository.findByUserId(UserSession.getUserId());
     	Optional<User> user = userRepository.findById(UserSession.getUserId());
-
-    	// user response
-    	UserDetailsResponse response = new UserDetailsResponse(user, userDetails);
-
-        // status object
+    	
+    	UserDetailsResponse obj = new UserDetailsResponse(user, detailsObj);
         JSONObject statusObj = new JSONObject();
-        statusObj.put(Constants.MESSAGE, HttpStatusCode.SUCCESS);
-        statusObj.put(Constants.STATUS_CODE, HttpStatusCode.SUCCESS.code());
-        // print debug log for user id
-        System.out.println(UserSession.getUserId());
-        // return response entity
-        return new ResponseEntity<>(ApiRes.success(response, statusObj), HttpStatus.OK);
+        statusObj.put("status_code", ResponseConstants.SUCCESS);
+        statusObj.put("message", "SUCCESS");
+        System.out.println(UserSession.getUserId()); 
+        return new ResponseEntity<>(ApiRes.success(obj, statusObj), HttpStatus.OK);
+
     }
 
     @GetMapping("/mod")
@@ -90,11 +94,9 @@ public class UserController {
     @SuppressWarnings("unchecked")
     @GetMapping("/signout")
     public ResponseEntity<?> logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        // status object
         JSONObject statusObj = new JSONObject();
-        statusObj.put(Constants.MESSAGE, HttpStatusCode.SUCCESS);
-        statusObj.put(Constants.STATUS_CODE, HttpStatusCode.SUCCESS.code());
-        // return response entity
+        statusObj.put("status_code", 200);
+        statusObj.put("message", "SUCCESS");
         return ResponseEntity.status(HttpStatus.OK).body(ApiRes.fail(statusObj));
     }
 }
