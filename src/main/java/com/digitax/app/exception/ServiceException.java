@@ -1,0 +1,12 @@
+package com.digitax.app.exception;
+
+public class ServiceException extends RuntimeException {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public ServiceException(String s) {
+        super(s);
+    }
+}

@@ -12,14 +12,14 @@ public class SessionResponse {
 
     private String accessToken;
 
-    private int expirationMiliSecond;
+    private long expirationMiliSecond;
 
     private Date utcExpirationTime;
 
     private Date ptExpirationTime;
 
 
-    public SessionResponse(String accessToken, int jwtExpirationMs) {
+    public SessionResponse(String accessToken, long jwtExpirationMs) {
         this.accessToken = accessToken;
         this.expirationMiliSecond = jwtExpirationMs;
         this.utcExpirationTime = new Date((new Date()).getTime() + jwtExpirationMs);

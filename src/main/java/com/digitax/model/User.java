@@ -40,9 +40,11 @@ public class User {
     @Size(max = 120)
     private String password;
 
-    @NotBlank
     @Size(max = 10)
     private String phone;
+    
+    @Column(name = "biometricDeviceId")
+    private String biometricDeviceId;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
@@ -62,6 +64,13 @@ public class User {
     @Column(name = "isVerifiedPhone")
     private int isVerifiedPhone;
     
+    
+    @Column(name = "deviceType")
+    private String deviceType;
+    
+    @Column(name = "resetToken")
+    private String resetToken;
+    
 
     @CreatedDate
     @Column(name = "created_at")
@@ -80,18 +89,20 @@ public class User {
     }
 
     /**
-     * User object
-     *
-     * @param username The username of the user
-     * @param email    The email of the user
-     * @param password The password of the user
-     * @param phone    The phone number of the user
+     * 
+     * @param username
+     * @param email
+     * @param password
+     * @param phone
+     * @param deviceType
+     * @param createdAt
      */
-    public User(String username, String email, String password, String phone, Long createdAt) {
+    public User(String username, String email, String password, String phone, String deviceType, Long createdAt) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.phone = phone;
+        this.deviceType = deviceType;
         this.createdAt = createdAt;
     }
 
