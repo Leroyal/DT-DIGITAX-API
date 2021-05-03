@@ -118,8 +118,21 @@
 		  <artifactId>twilio</artifactId>
 		  <version>8.0.0</version>
 		</dependency>
+		<dependency>
+    <groupId>mef</groupId>
+    <artifactId>mef-app</artifactId>
+    <version>11.1</version>
+    <scope>system</scope>
+    <systemPath>${basedir}/lib/mef_client_sdk.jar</systemPath>
+</dependency> 
     </dependencies>
-
+<repositories>
+    <repository>
+        <id>localrepository</id>
+        <url>file://${basedir}/lib</url>
+    </repository>
+    
+</repositories>
     <build>
         <plugins>
             <plugin>
