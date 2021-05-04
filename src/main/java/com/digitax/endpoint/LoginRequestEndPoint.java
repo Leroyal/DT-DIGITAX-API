@@ -2,7 +2,7 @@ package com.digitax.endpoint;
 
 import java.io.File;
 
-
+import org.springframework.stereotype.Component;
 
 import gov.irs.a2a.mef.mefheader.TestCdType;
 import gov.irs.mef.ApplicationContext;
@@ -10,7 +10,7 @@ import gov.irs.mef.services.ServiceContext;
 import gov.irs.mef.services.data.ETIN;
 import gov.irs.mef.services.msi.LoginClient;
 import gov.irs.mef.services.msi.LoginResult;
-
+@Component
 public class LoginRequestEndPoint {
 	//private static final Logger logger = LoggerFactory.getLogger(LoginRequestEndpoint.class);
 

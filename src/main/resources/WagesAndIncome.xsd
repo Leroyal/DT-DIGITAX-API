@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+
+xmlns:tns="http://www.irs.gov/a2a/mef/WagesAndIncome"
+           targetNamespace="http://www.irs.gov/a2a/mef/WagesAndIncome" elementFormDefault="qualified" attributeFormDefault="unqualified">
+       
+        
+       <xsd:element name="getWagesAndIncomeRequest">
+       <xsd:annotation>
+<xsd:documentation>This element will be used by wages and income of 
+ TaxPayer.
+</xsd:documentation>
+</xsd:annotation>
+        <xsd:complexType>
+            <xsd:sequence>
+                  
+                 
+<xsd:element name="ComapnyName" type="xsd:string"/>
+<xsd:element name="ComapnyAdress" type="xsd:string"/>
+<xsd:element name="wages" type="xsd:int"/>
+<xsd:element name="DateOfJoining" type="xsd:date"/>
+<xsd:element name="DateOfExist" type="xsd:date"/>
+<xsd:element name="Interest" type="xsd:int"/>
+<xsd:element name="SchoolTax" type="xsd:int"/>
+<xsd:element name="StudentLoan" type="xsd:int"/>
+<xsd:element name="Postiononcompany" type="xsd:string"/>
+<xsd:element name="TaxStartDate" type="xsd:string"/>
+<xsd:element name="TaxEndDate" type="xsd:string"/>
+         
+                
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>    
+     <xsd:element name="getWagesAndIncomeResponse">
+      <xsd:complexType>
+            <xsd:sequence>
+    <xsd:element name="statusTxt" type="xsd:string"/>   
+    </xsd:sequence>
+    </xsd:complexType>    
+      </xsd:element>     
+         </xsd:schema>

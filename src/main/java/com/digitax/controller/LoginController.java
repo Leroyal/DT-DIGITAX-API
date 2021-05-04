@@ -20,7 +20,7 @@ public class LoginController {
 	@Autowired
 	LoginRequestEndPoint loginRequestEndPoint;
 	ApplicationContext applicationContext;
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	@RequestMapping(value = "/logintomef", method = RequestMethod.POST)
 			
 	
 	    public LoginResult logUser() throws ToolkitException, gov.irs.mef.exception.ServiceException {
